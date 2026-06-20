@@ -8,5 +8,6 @@
     android:initialLayout="@layout/prayer_widget_layout"
     android:previewLayout="@layout/prayer_widget_layout"
     android:resizeMode="horizontal|vertical"
-    android:widgetCategory="home_screen">
+    android:widgetCategory="home_screen"
+    android:description="@string/app_name">
 </appwidget-provider>
