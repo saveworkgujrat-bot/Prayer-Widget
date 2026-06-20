@@ -24,16 +24,15 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-        with:
-          gradle-version: '8.0'
+      - name: Generate Gradle Wrapper
+        run: |
+          wget https://services.gradle.org/distributions/gradle-8.0-bin.zip -q
+          unzip -q gradle-8.0-bin.zip
+          ./gradle-8.0/bin/gradle wrapper
+          chmod +x gradlew
 
       - name: Fix Build Files
         run: python3 fix_build.py
-
-      - name: Grant Gradlew Permission
-        run: chmod +x gradlew
 
       - name: Build Debug APK
         run: ./gradlew assembleDebug --no-daemon
