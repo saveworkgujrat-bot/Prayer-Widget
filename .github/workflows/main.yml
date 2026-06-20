@@ -31,7 +31,6 @@ jobs:
           mkdir -p app/src/main/res/values
           mkdir -p gradle/wrapper
 
-          # Move existing files into app folder
           [ -f AndroidManifest.xml ] && mv AndroidManifest.xml app/src/main/
           [ -f BootReceiver.kt ] && mv BootReceiver.kt app/src/main/java/com/gujrat/prayerwidget/
           [ -f PrayerUpdateService.kt ] && mv PrayerUpdateService.kt app/src/main/java/com/gujrat/prayerwidget/
@@ -43,7 +42,6 @@ jobs:
           [ -f widget_bg.xml ] && mv widget_bg.xml app/src/main/res/drawable/
           [ -f strings.xml ] && mv strings.xml app/src/main/res/values/
 
-          # Root build.gradle (project level)
           cat > build.gradle << 'EOF'
           plugins {
               id 'com.android.application' version '8.3.0' apply false
@@ -51,7 +49,6 @@ jobs:
           }
           EOF
 
-          # App level build.gradle
           cat > app/build.gradle << 'EOF'
           plugins {
               id 'com.android.application'
@@ -81,7 +78,6 @@ jobs:
           }
           EOF
 
-          # settings.gradle
           cat > settings.gradle << 'EOF'
           pluginManagement {
               repositories {
@@ -101,7 +97,6 @@ jobs:
           include ':app'
           EOF
 
-          # Gradle wrapper
           wget -q https://services.gradle.org/distributions/gradle-8.1-bin.zip
           unzip -q gradle-8.1-bin.zip
           ./gradle-8.1/bin/gradle wrapper --gradle-version 8.1
