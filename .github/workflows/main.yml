@@ -36,6 +36,7 @@ jobs:
           printf 'plugins {\n    id "com.android.application" version "8.3.0" apply false\n    id "org.jetbrains.kotlin.android" version "1.9.0" apply false\n}\n' > build.gradle
           printf 'plugins {\n    id "com.android.application"\n    id "org.jetbrains.kotlin.android"\n}\nandroid {\n    namespace "com.gujrat.prayerwidget"\n    compileSdk 34\n    defaultConfig {\n        applicationId "com.gujrat.prayerwidget"\n        minSdk 26\n        targetSdk 34\n        versionCode 1\n        versionName "1.0"\n    }\n    compileOptions {\n        sourceCompatibility JavaVersion.VERSION_17\n        targetCompatibility JavaVersion.VERSION_17\n    }\n    kotlinOptions {\n        jvmTarget = "17"\n    }\n}\ndependencies {\n    implementation "androidx.core:core-ktx:1.12.0"\n    implementation "androidx.appcompat:appcompat:1.6.1"\n}\n' > app/build.gradle
           printf 'pluginManagement {\n    repositories {\n        google()\n        mavenCentral()\n        gradlePluginPortal()\n    }\n}\ndependencyResolutionManagement {\n    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)\n    repositories {\n        google()\n        mavenCentral()\n    }\n}\nrootProject.name = "PrayerWidget"\ninclude ":app"\n' > settings.gradle
+          printf 'android.useAndroidX=true\nandroid.enableJetifier=true\norg.gradle.jvmargs=-Xmx2048m\n' > gradle.properties
           wget -q https://services.gradle.org/distributions/gradle-8.4-bin.zip
           unzip -q gradle-8.4-bin.zip
           ./gradle-8.4/bin/gradle wrapper --gradle-version 8.4
