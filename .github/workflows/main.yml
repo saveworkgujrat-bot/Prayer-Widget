@@ -3,8 +3,6 @@ name: Build Prayer Widget APK
 on:
   push:
     branches: [ "main", "master" ]
-  pull_request:
-    branches: [ "main", "master" ]
   workflow_dispatch:
 
 jobs:
@@ -24,18 +22,93 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Generate Gradle Wrapper
+      - name: Create proper Android project structure
         run: |
-          wget https://services.gradle.org/distributions/gradle-8.0-bin.zip -q
-          unzip -q gradle-8.0-bin.zip
-          ./gradle-8.0/bin/gradle wrapper
+          mkdir -p app/src/main/java/com/gujrat/prayerwidget
+          mkdir -p app/src/main/res/xml
+          mkdir -p app/src/main/res/layout
+          mkdir -p app/src/main/res/drawable
+          mkdir -p app/src/main/res/values
+          mkdir -p gradle/wrapper
+
+          # Move existing files into app folder
+          [ -f AndroidManifest.xml ] && mv AndroidManifest.xml app/src/main/
+          [ -f BootReceiver.kt ] && mv BootReceiver.kt app/src/main/java/com/gujrat/prayerwidget/
+          [ -f PrayerUpdateService.kt ] && mv PrayerUpdateService.kt app/src/main/java/com/gujrat/prayerwidget/
+          [ -f PrayerWidgetProvider.kt ] && mv PrayerWidgetProvider.kt app/src/main/java/com/gujrat/prayerwidget/
+          [ -f prayer_widget_info.xml ] && mv prayer_widget_info.xml app/src/main/res/xml/
+          [ -f prayer_widget_layout.xml ] && mv prayer_widget_layout.xml app/src/main/res/layout/
+          [ -f schedule_bg.xml ] && mv schedule_bg.xml app/src/main/res/drawable/
+          [ -f time_badge_bg.xml ] && mv time_badge_bg.xml app/src/main/res/drawable/
+          [ -f widget_bg.xml ] && mv widget_bg.xml app/src/main/res/drawable/
+          [ -f strings.xml ] && mv strings.xml app/src/main/res/values/
+
+          # Root build.gradle (project level)
+          cat > build.gradle << 'EOF'
+          plugins {
+              id 'com.android.application' version '8.1.0' apply false
+              id 'org.jetbrains.kotlin.android' version '1.9.0' apply false
+          }
+          EOF
+
+          # App level build.gradle
+          cat > app/build.gradle << 'EOF'
+          plugins {
+              id 'com.android.application'
+              id 'org.jetbrains.kotlin.android'
+          }
+          android {
+              namespace 'com.gujrat.prayerwidget'
+              compileSdk 34
+              defaultConfig {
+                  applicationId "com.gujrat.prayerwidget"
+                  minSdk 26
+                  targetSdk 34
+                  versionCode 1
+                  versionName "1.0"
+              }
+              compileOptions {
+                  sourceCompatibility JavaVersion.VERSION_17
+                  targetCompatibility JavaVersion.VERSION_17
+              }
+              kotlinOptions {
+                  jvmTarget = '17'
+              }
+          }
+          dependencies {
+              implementation 'androidx.core:core-ktx:1.12.0'
+              implementation 'androidx.appcompat:appcompat:1.6.1'
+          }
+          EOF
+
+          # settings.gradle
+          cat > settings.gradle << 'EOF'
+          pluginManagement {
+              repositories {
+                  google()
+                  mavenCentral()
+                  gradlePluginPortal()
+              }
+          }
+          dependencyResolutionManagement {
+              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
+          rootProject.name = "PrayerWidget"
+          include ':app'
+          EOF
+
+          # Gradle wrapper
+          wget -q https://services.gradle.org/distributions/gradle-8.1-bin.zip
+          unzip -q gradle-8.1-bin.zip
+          ./gradle-8.1/bin/gradle wrapper --gradle-version 8.1
           chmod +x gradlew
 
-      - name: Fix Build Files
-        run: python3 fix_build.py
-
       - name: Build Debug APK
-        run: ./gradlew assembleDebug --no-daemon
+        run: ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
