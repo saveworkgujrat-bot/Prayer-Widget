@@ -26,7 +26,7 @@ task clean(type: Delete) {
 """)
 
 # Fix app/build.gradle
-with open("app/build.gradle", "w") as f:
+with open("build.gradle", "w") as f:
     f.write("""apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
