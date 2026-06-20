@@ -23,9 +23,27 @@ jobs:
           mkdir -p app/src/main/res/layout
           mkdir -p app/src/main/res/drawable
           mkdir -p app/src/main/res/values
-          [ -f AndroidManifest.xml ] && mv AndroidManifest.xml app/src/main/
-          [ -f BootReceiver.kt ] && mv BootReceiver.kt app/src/main/java/com/gujrat/prayerwidget/
-          [ -f PrayerUpdateService.kt ] && mv PrayerUpdateService.kt app/src/main/java/com/gujrat/prayerwidget/
-          [ -f PrayerWidgetProvider.kt ] && mv PrayerWidgetProvider.kt app/src/main/java/com/gujrat/prayerwidget/
-          [ -f prayer_widget_info.xml ] && mv prayer_widget_info.xml app/src/main/res/xml/
-          [ -f prayer_widget_layout.xml ] && mv
+          cp AndroidManifest.xml app/src/main/ 2>/dev/null || true
+          cp BootReceiver.kt app/src/main/java/com/gujrat/prayerwidget/ 2>/dev/null || true
+          cp PrayerUpdateService.kt app/src/main/java/com/gujrat/prayerwidget/ 2>/dev/null || true
+          cp PrayerWidgetProvider.kt app/src/main/java/com/gujrat/prayerwidget/ 2>/dev/null || true
+          cp prayer_widget_info.xml app/src/main/res/xml/ 2>/dev/null || true
+          cp prayer_widget_layout.xml app/src/main/res/layout/ 2>/dev/null || true
+          cp schedule_bg.xml app/src/main/res/drawable/ 2>/dev/null || true
+          cp time_badge_bg.xml app/src/main/res/drawable/ 2>/dev/null || true
+          cp widget_bg.xml app/src/main/res/drawable/ 2>/dev/null || true
+          cp strings.xml app/src/main/res/values/ 2>/dev/null || true
+          printf 'plugins {\n    id "com.android.application" version "8.3.0" apply false\n    id "org.jetbrains.kotlin.android" version "1.9.0" apply false\n}\n' > build.gradle
+          printf 'plugins {\n    id "com.android.application"\n    id "org.jetbrains.kotlin.android"\n}\nandroid {\n    namespace "com.gujrat.prayerwidget"\n    compileSdk 34\n    defaultConfig {\n        applicationId "com.gujrat.prayerwidget"\n        minSdk 26\n        targetSdk 34\n        versionCode 1\n        versionName "1.0"\n    }\n    compileOptions {\n        sourceCompatibility JavaVersion.VERSION_17\n        targetCompatibility JavaVersion.VERSION_17\n    }\n    kotlinOptions {\n        jvmTarget = "17"\n    }\n}\ndependencies {\n    implementation "androidx.core:core-ktx:1.12.0"\n    implementation "androidx.appcompat:appcompat:1.6.1"\n}\n' > app/build.gradle
+          printf 'pluginManagement {\n    repositories {\n        google()\n        mavenCentral()\n        gradlePluginPortal()\n    }\n}\ndependencyResolutionManagement {\n    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)\n    repositories {\n        google()\n        mavenCentral()\n    }\n}\nrootProject.name = "PrayerWidget"\ninclude ":app"\n' > settings.gradle
+          wget -q https://services.gradle.org/distributions/gradle-8.4-bin.zip
+          unzip -q gradle-8.4-bin.zip
+          ./gradle-8.4/bin/gradle wrapper --gradle-version 8.4
+          chmod +x gradlew
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug --no-daemon
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Prayer-Widget-Debug
+          path: app/build/outputs/apk/debug/app-debug.apk
