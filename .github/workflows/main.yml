@@ -33,6 +33,110 @@ jobs:
           cp time_badge_bg.xml app/src/main/res/drawable/ 2>/dev/null || true
           cp widget_bg.xml app/src/main/res/drawable/ 2>/dev/null || true
           cp strings.xml app/src/main/res/values/ 2>/dev/null || true
+
+          cat > app/src/main/AndroidManifest.xml << 'MANIFEST'
+          <?xml version="1.0" encoding="utf-8"?>
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+              package="com.gujrat.prayerwidget">
+              <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+              <application
+                  android:allowBackup="true"
+                  android:label="Prayer Widget"
+                  android:supportsRtl="true"
+                  android:theme="@android:style/Theme.DeviceDefault">
+                  <receiver
+                      android:name=".PrayerWidgetProvider"
+                      android:exported="true">
+                      <intent-filter>
+                          <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                      </intent-filter>
+                      <meta-data
+                          android:name="android.appwidget.provider"
+                          android:resource="@xml/prayer_widget_info" />
+                  </receiver>
+                  <service
+                      android:name=".PrayerUpdateService"
+                      android:exported="false" />
+                  <receiver
+                      android:name=".BootReceiver"
+                      android:exported="true">
+                      <intent-filter>
+                          <action android:name="android.intent.action.BOOT_COMPLETED" />
+                      </intent-filter>
+                  </receiver>
+              </application>
+          </manifest>
+          MANIFEST
+
+          cat > app/src/main/res/xml/prayer_widget_info.xml << 'WIDGETINFO'
+          <?xml version="1.0" encoding="utf-8"?>
+          <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+              android:minWidth="250dp"
+              android:minHeight="110dp"
+              android:targetCellWidth="4"
+              android:targetCellHeight="2"
+              android:updatePeriodMillis="1800000"
+              android:initialLayout="@layout/prayer_widget_layout"
+              android:previewLayout="@layout/prayer_widget_layout"
+              android:resizeMode="horizontal|vertical"
+              android:widgetCategory="home_screen"
+              android:description="@string/app_name">
+          </appwidget-provider>
+          WIDGETINFO
+
+          cat > app/src/main/java/com/gujrat/prayerwidget/PrayerWidgetProvider.kt << 'PROVIDER'
+          package com.gujrat.prayerwidget
+          import android.appwidget.AppWidgetManager
+          import android.appwidget.AppWidgetProvider
+          import android.content.Context
+          import android.widget.RemoteViews
+          import java.util.Calendar
+          class PrayerWidgetProvider : AppWidgetProvider() {
+              override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
+                  for (id in appWidgetIds) { updateWidget(context, appWidgetManager, id) }
+              }
+              companion object {
+                  val PRAYERS = listOf(
+                      Triple("Fajr", 3*60+15, "3:15 AM"),
+                      Triple("Dhuhr", 12*60+5, "12:05 PM"),
+                      Triple("Asr", 17*60+3, "5:03 PM"),
+                      Triple("Maghrib", 19*60+14, "7:14 PM"),
+                      Triple("Isha", 20*60+55, "8:55 PM")
+                  )
+                  fun updateWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
+                      try {
+                          val views = RemoteViews(context.packageName, R.layout.prayer_widget_layout)
+                          val cal = Calendar.getInstance()
+                          val now = cal.get(Calendar.HOUR_OF_DAY) * 60 + cal.get(Calendar.MINUTE)
+                          val sec = cal.get(Calendar.SECOND)
+                          var nextPrayer = PRAYERS[0]
+                          var minDiff = Int.MAX_VALUE
+                          for (p in PRAYERS) { val diff = p.second - now; if (diff > 0 && diff < minDiff) { minDiff = diff; nextPrayer = p } }
+                          if (minDiff == Int.MAX_VALUE) { nextPrayer = PRAYERS[0]; minDiff = 1440 - now + PRAYERS[0].second }
+                          val totalSecs = minDiff * 60 - sec
+                          views.setTextViewText(R.id.widget_prayer_name, nextPrayer.first)
+                          views.setTextViewText(R.id.widget_prayer_time, nextPrayer.third)
+                          views.setTextViewText(R.id.widget_countdown, String.format("%02d:%02d:%02d", totalSecs/3600, (totalSecs%3600)/60, totalSecs%60))
+                          views.setTextViewText(R.id.widget_location, "Gujrat")
+                          val scheduleIds = listOf(
+                              Triple(R.id.fajr_name, R.id.fajr_time, PRAYERS[0]),
+                              Triple(R.id.dhuhr_name, R.id.dhuhr_time, PRAYERS[1]),
+                              Triple(R.id.asr_name, R.id.asr_time, PRAYERS[2]),
+                              Triple(R.id.maghrib_name, R.id.maghrib_time, PRAYERS[3]),
+                              Triple(R.id.isha_name, R.id.isha_time, PRAYERS[4])
+                          )
+                          for ((nameId, timeId, prayer) in scheduleIds) {
+                              views.setTextColor(nameId, if (prayer.first == nextPrayer.first) 0xFF10B981.toInt() else 0xCCFFFFFF.toInt())
+                              views.setTextColor(timeId, if (prayer.first == nextPrayer.first) 0xFF10B981.toInt() else 0x88AAAAAA.toInt())
+                              views.setTextViewText(timeId, prayer.third)
+                          }
+                          appWidgetManager.updateAppWidget(appWidgetId, views)
+                      } catch (e: Exception) { e.printStackTrace() }
+                  }
+              }
+          }
+          PROVIDER
+
           printf 'plugins {\n    id "com.android.application" version "8.3.0" apply false\n    id "org.jetbrains.kotlin.android" version "1.9.0" apply false\n}\n' > build.gradle
           printf 'plugins {\n    id "com.android.application"\n    id "org.jetbrains.kotlin.android"\n}\nandroid {\n    namespace "com.gujrat.prayerwidget"\n    compileSdk 34\n    defaultConfig {\n        applicationId "com.gujrat.prayerwidget"\n        minSdk 26\n        targetSdk 34\n        versionCode 1\n        versionName "1.0"\n    }\n    compileOptions {\n        sourceCompatibility JavaVersion.VERSION_17\n        targetCompatibility JavaVersion.VERSION_17\n    }\n    kotlinOptions {\n        jvmTarget = "17"\n    }\n}\ndependencies {\n    implementation "androidx.core:core-ktx:1.12.0"\n    implementation "androidx.appcompat:appcompat:1.6.1"\n}\n' > app/build.gradle
           printf 'pluginManagement {\n    repositories {\n        google()\n        mavenCentral()\n        gradlePluginPortal()\n    }\n}\ndependencyResolutionManagement {\n    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)\n    repositories {\n        google()\n        mavenCentral()\n    }\n}\nrootProject.name = "PrayerWidget"\ninclude ":app"\n' > settings.gradle
