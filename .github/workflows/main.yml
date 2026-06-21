@@ -16,8 +16,13 @@ jobs:
           java-version: '17'
       - uses: android-actions/setup-android@v3
 
-      - name: Build APK
+      - name: Create Project Files
         run: python3 build_widget.py
+
+      - name: Build APK
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
 
       - uses: actions/upload-artifact@v4
         with:
