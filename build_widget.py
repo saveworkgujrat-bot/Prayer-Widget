@@ -131,7 +131,7 @@ open('app/src/main/java/com/gujrat/prayerwidget/PrayerCalc.kt','w').write(
 '        }\n'
 '        val fajr = noon - ha(-18.0)\n'
 '        val dhuhr = noon\n'
-'        val asrAlt = Math.toDegrees(atan(1.0 + tan(Math.toRadians(abs(LAT - decl)))))\n'
+'        val asrAlt = Math.toDegrees(atan(2.0 + tan(Math.toRadians(abs(LAT - decl)))))\n'
 '        val cAsr = (sin(Math.toRadians(90.0 - asrAlt)) - sin(Math.toRadians(LAT)) * sin(Math.toRadians(decl))) /\n'
 '                   (cos(Math.toRadians(LAT)) * cos(Math.toRadians(decl)))\n'
 '        val asr = noon + Math.toDegrees(acos(cAsr.coerceIn(-1.0, 1.0))) / 15.0\n'
