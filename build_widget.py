@@ -51,53 +51,47 @@ for name in ['classic','gold','slate','rose','ocean']:
     '    android:widgetCategory="home_screen">\n'
     '</appwidget-provider>\n')
 
-def make_layout(accent, bg='#CC0D1B2A', schedule_bg='#CC1A2535'):
+def make_layout(accent):
     return (
     '<?xml version="1.0" encoding="utf-8"?>\n'
     '<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"\n'
     '    android:layout_width="match_parent" android:layout_height="match_parent"\n'
-    f'    android:orientation="horizontal" android:padding="12dp" android:background="{bg}">\n'
+    '    android:orientation="horizontal" android:padding="12dp">\n'
     '    <LinearLayout android:layout_width="0dp" android:layout_height="match_parent"\n'
     '        android:layout_weight="1" android:orientation="vertical" android:gravity="center_vertical">\n'
     '        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"\n'
-    '            android:text="NEXT PRAYER" android:textColor="#AAAAAA" android:textSize="9sp" android:letterSpacing="0.1"/>\n'
+    '            android:text="NEXT PRAYER" android:textColor="#AAAAAA" android:textSize="9sp"/>\n'
     '        <TextView android:id="@+id/widget_prayer_name" android:layout_width="wrap_content"\n'
     '            android:layout_height="wrap_content" android:text="Asr"\n'
     '            android:textColor="#FFFFFF" android:textSize="22sp" android:textStyle="bold"/>\n'
     '        <TextView android:id="@+id/widget_prayer_time" android:layout_width="wrap_content"\n'
     '            android:layout_height="wrap_content" android:text="5:04 PM"\n'
-    f'           android:textColor="{accent}" android:textSize="12sp"/>\n'
+    f'            android:textColor="{accent}" android:textSize="12sp"/>\n'
     '        <TextView android:id="@+id/widget_countdown" android:layout_width="wrap_content"\n'
     '            android:layout_height="wrap_content" android:text="00:00:00"\n'
     '            android:textColor="#FFFFFF" android:textSize="26sp" android:textStyle="bold"/>\n'
-    '        <View android:layout_width="match_parent" android:layout_height="1dp"\n'
-    f'           android:background="{accent}" android:alpha="0.3" android:layout_marginTop="4dp" android:layout_marginBottom="4dp"/>\n'
-    '        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">\n'
-    f'           <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📍 " android:textSize="10sp"/>\n'
-    '            <TextView android:id="@+id/widget_location" android:layout_width="wrap_content"\n'
-    '                android:layout_height="wrap_content" android:text="Gujrat"\n'
-    f'               android:textColor="{accent}" android:textSize="11sp" android:textStyle="bold"/>\n'
-    '        </LinearLayout>\n'
+    '        <TextView android:id="@+id/widget_location" android:layout_width="wrap_content"\n'
+    '            android:layout_height="wrap_content" android:text="Gujrat"\n'
+    f'            android:textColor="{accent}" android:textSize="11sp" android:textStyle="bold"/>\n'
     '    </LinearLayout>\n'
-    f'   <LinearLayout android:layout_width="155dp" android:layout_height="match_parent"\n'
-    f'       android:orientation="vertical" android:gravity="center_vertical" android:background="{schedule_bg}"\n'
-    '        android:padding="8dp">\n'
+    '    <LinearLayout android:layout_width="145dp" android:layout_height="match_parent"\n'
+    '        android:orientation="vertical" android:gravity="center_vertical">\n'
     '        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"\n'
     '            android:text="TODAY SCHEDULE" android:textColor="#AAAAAA" android:textSize="8sp"\n'
-    '            android:gravity="center" android:layout_marginBottom="5dp" android:letterSpacing="0.1"/>\n'
-    '        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="3dp"><TextView android:id="@+id/fajr_name" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Fajr" android:textColor="#CCFFFFFF" android:textSize="11sp" android:textStyle="bold"/><TextView android:id="@+id/fajr_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="3:15 AM" android:textColor="#88FFFFFF" android:textSize="11sp"/></LinearLayout>\n'
-    '        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="3dp"><TextView android:id="@+id/dhuhr_name" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Dhuhr" android:textColor="#CCFFFFFF" android:textSize="11sp" android:textStyle="bold"/><TextView android:id="@+id/dhuhr_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="12:05 PM" android:textColor="#88FFFFFF" android:textSize="11sp"/></LinearLayout>\n'
-    '        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="3dp"><TextView android:id="@+id/asr_name" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Asr" android:textColor="#CCFFFFFF" android:textSize="11sp" android:textStyle="bold"/><TextView android:id="@+id/asr_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="5:04 PM" android:textColor="#88FFFFFF" android:textSize="11sp"/></LinearLayout>\n'
-    '        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="3dp"><TextView android:id="@+id/maghrib_name" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Maghrib" android:textColor="#CCFFFFFF" android:textSize="11sp" android:textStyle="bold"/><TextView android:id="@+id/maghrib_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="7:14 PM" android:textColor="#88FFFFFF" android:textSize="11sp"/></LinearLayout>\n'
-    '        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal"><TextView android:id="@+id/isha_name" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Isha" android:textColor="#CCFFFFFF" android:textSize="11sp" android:textStyle="bold"/><TextView android:id="@+id/isha_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="8:55 PM" android:textColor="#88FFFFFF" android:textSize="11sp"/></LinearLayout>\n'
+    '            android:gravity="center" android:layout_marginBottom="4dp"/>\n'
+    f'        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="3dp"><TextView android:id="@+id/fajr_name" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Fajr" android:textColor="#CCFFFFFF" android:textSize="13sp" android:textStyle="bold"/><TextView android:id="@+id/fajr_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="3:15 AM" android:textColor="{accent}" android:textSize="13sp"/></LinearLayout>\n'
+    f'        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="3dp"><TextView android:id="@+id/dhuhr_name" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Dhuhr" android:textColor="#CCFFFFFF" android:textSize="13sp" android:textStyle="bold"/><TextView android:id="@+id/dhuhr_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="12:05 PM" android:textColor="{accent}" android:textSize="13sp"/></LinearLayout>\n'
+    f'        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="3dp"><TextView android:id="@+id/asr_name" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Asr" android:textColor="#CCFFFFFF" android:textSize="13sp" android:textStyle="bold"/><TextView android:id="@+id/asr_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="5:04 PM" android:textColor="{accent}" android:textSize="13sp"/></LinearLayout>\n'
+    f'        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="3dp"><TextView android:id="@+id/maghrib_name" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Maghrib" android:textColor="#CCFFFFFF" android:textSize="13sp" android:textStyle="bold"/><TextView android:id="@+id/maghrib_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="7:14 PM" android:textColor="{accent}" android:textSize="13sp"/></LinearLayout>\n'
+    f'        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal"><TextView android:id="@+id/isha_name" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Isha" android:textColor="#CCFFFFFF" android:textSize="13sp" android:textStyle="bold"/><TextView android:id="@+id/isha_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="8:55 PM" android:textColor="{accent}" android:textSize="13sp"/></LinearLayout>\n'
     '    </LinearLayout>\n'
     '</LinearLayout>\n')
 
-open('app/src/main/res/layout/widget_layout_classic.xml','w').write(make_layout('#10B981','#CC0D1B2A','#CC1A2535'))
-open('app/src/main/res/layout/widget_layout_gold.xml','w').write(make_layout('#F59E0B','#CC1A1200','#CC2A1E00'))
-open('app/src/main/res/layout/widget_layout_slate.xml','w').write(make_layout('#94A3B8','#CC0F172A','#CC1E293B'))
-open('app/src/main/res/layout/widget_layout_rose.xml','w').write(make_layout('#FB7185','#CC1A0510','#CC2A0A1A'))
-open('app/src/main/res/layout/widget_layout_ocean.xml','w').write(make_layout('#38BDF8','#CC001A2A','#CC002A3A'))
+open('app/src/main/res/layout/widget_layout_classic.xml','w').write(make_layout('#10B981'))
+open('app/src/main/res/layout/widget_layout_gold.xml','w').write(make_layout('#F59E0B'))
+open('app/src/main/res/layout/widget_layout_slate.xml','w').write(make_layout('#94A3B8'))
+open('app/src/main/res/layout/widget_layout_rose.xml','w').write(make_layout('#FB7185'))
+open('app/src/main/res/layout/widget_layout_ocean.xml','w').write(make_layout('#38BDF8'))
 
 open('app/src/main/res/values/strings.xml','w').write(
 '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <string name="app_name">Prayer Widget</string>\n</resources>\n')
@@ -108,7 +102,9 @@ open('app/src/main/java/com/gujrat/prayerwidget/PrayerCalc.kt','w').write(
 'import java.util.Calendar\n'
 'import kotlin.math.*\n'
 'object PrayerCalc {\n'
-'    const val LAT=32.5736; const val LNG=74.0874; const val TZ=5.0\n'
+'    private const val LAT=32.5736\n'
+'    private const val LNG=74.0874\n'
+'    private const val TZ=5.0\n'
 '    fun calcPrayerTimes(cal: Calendar): List<Triple<String,Int,String>> {\n'
 '        val y=cal.get(Calendar.YEAR);val m=cal.get(Calendar.MONTH)+1;val d=cal.get(Calendar.DAY_OF_MONTH)\n'
 '        val jd=367.0*y-(7*(y+(m+9)/12)/4).toInt()+(275*m/9).toInt()+d+1721013.5\n'
@@ -126,17 +122,21 @@ open('app/src/main/java/com/gujrat/prayerwidget/PrayerCalc.kt','w').write(
 '            return Math.toDegrees(acos(c.coerceIn(-1.0,1.0)))/15.0\n'
 '        }\n'
 '        val fajr=noon-ha(-18.0)\n'
-'        val dhuhr=noon+0.0\n'
+'        val dhuhr=noon\n'
 '        val asrAngle=Math.toDegrees(atan(1.0+tan(Math.toRadians(abs(LAT-decl)))))\n'
 '        val cA=(sin(Math.toRadians(90.0-asrAngle))-sin(Math.toRadians(LAT))*sin(Math.toRadians(decl)))/(cos(Math.toRadians(LAT))*cos(Math.toRadians(decl)))\n'
 '        val asr=noon+Math.toDegrees(acos(cA.coerceIn(-1.0,1.0)))/15.0\n'
 '        val maghrib=noon+ha(-0.833)\n'
-'        val isha=noon+ha(-18.0)+ha(-0.833)\n'
+'        val isha=noon+ha(-18.0)\n'
 '        fun fmt(t:Double):Pair<Int,String> {\n'
-'            val tt=((t%24)+24)%24;val h=tt.toInt();val min=((tt-h)*60).roundToInt()\n'
-'            val hh=if(min==60) h+1 else h;val mm=if(min==60) 0 else min\n'
-'            val ap=if(hh%24<12)"AM" else "PM";val h12=if(hh%12==0)12 else hh%12\n'
-'            return Pair(hh*60+mm,"$h12:${mm.toString().padStart(2,\'0\')} $ap")\n'
+'            val tt=((t%24)+24)%24\n'
+'            val h=tt.toInt()\n'
+'            var min=((tt-h)*60).roundToInt()\n'
+'            var hh=h\n'
+'            if(min>=60){min-=60;hh+=1}\n'
+'            val ap=if(hh%24<12) "AM" else "PM"\n'
+'            val h12=if(hh%12==0) 12 else hh%12\n'
+'            return Pair(hh*60+min,"$h12:${min.toString().padStart(2,\'0\')} $ap")\n'
 '        }\n'
 '        val(fm,fs)=fmt(fajr);val(dm,ds)=fmt(dhuhr)\n'
 '        val(am,as2)=fmt(asr);val(mm,ms)=fmt(maghrib);val(im,is2)=fmt(isha)\n'
@@ -151,8 +151,8 @@ open('app/src/main/java/com/gujrat/prayerwidget/PrayerCalc.kt','w').write(
 '        for(p in prayers){val d=p.second-now;if(d>0&&d<diff){diff=d;next=p}}\n'
 '        if(diff==Int.MAX_VALUE){next=prayers[0];diff=1440-now+prayers[0].second}\n'
 '        val totalSecs=diff*60-sec\n'
-'        val hh=totalSecs/3600;val mm=(totalSecs%3600)/60;val ss=totalSecs%60\n'
-'        views.setTextViewText(R.id.widget_countdown,String.format("%02d:%02d:%02d",hh,mm,ss))\n'
+'        val hh=totalSecs/3600;val mm2=(totalSecs%3600)/60;val ss=totalSecs%60\n'
+'        views.setTextViewText(R.id.widget_countdown,String.format("%02d:%02d:%02d",hh,mm2,ss))\n'
 '        views.setTextViewText(R.id.widget_prayer_name,next.first)\n'
 '        views.setTextViewText(R.id.widget_prayer_time,next.third)\n'
 '        views.setTextViewText(R.id.widget_location,"Gujrat")\n'
@@ -175,8 +175,10 @@ for name, accent, layout in [
     ('Ocean','0xFF38BDF8.toInt()','widget_layout_ocean')]:
     open(f'app/src/main/java/com/gujrat/prayerwidget/PrayerWidget{name}.kt','w').write(
     f'package com.gujrat.prayerwidget\n'
-    'import android.appwidget.AppWidgetManager\nimport android.appwidget.AppWidgetProvider\n'
-    'import android.content.Context\nimport android.widget.RemoteViews\n'
+    'import android.appwidget.AppWidgetManager\n'
+    'import android.appwidget.AppWidgetProvider\n'
+    'import android.content.Context\n'
+    'import android.widget.RemoteViews\n'
     f'class PrayerWidget{name} : AppWidgetProvider() {{\n'
     '    override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {\n'
     '        for (id in appWidgetIds) {\n'
@@ -189,8 +191,12 @@ for name, accent, layout in [
 
 open('app/src/main/java/com/gujrat/prayerwidget/BootReceiver.kt','w').write(
 'package com.gujrat.prayerwidget\n'
-'import android.appwidget.AppWidgetManager\nimport android.content.BroadcastReceiver\n'
-'import android.content.ComponentName\nimport android.content.Context\nimport android.content.Intent\nimport android.widget.RemoteViews\n'
+'import android.appwidget.AppWidgetManager\n'
+'import android.content.BroadcastReceiver\n'
+'import android.content.ComponentName\n'
+'import android.content.Context\n'
+'import android.content.Intent\n'
+'import android.widget.RemoteViews\n'
 'class BootReceiver : BroadcastReceiver() {\n'
 '    override fun onReceive(context: Context, intent: Intent) {\n'
 '        if(intent.action==Intent.ACTION_BOOT_COMPLETED){\n'
@@ -218,4 +224,4 @@ open('gradle/wrapper/gradle-wrapper.properties','w').write('distributionBase=GRA
 
 urllib.request.urlretrieve('https://raw.githubusercontent.com/gradle/gradle/v8.4.0/gradlew','gradlew')
 os.chmod('gradlew',0o755)
-print('Done! 5 widgets created!')
+print('Done! 5 widgets ready!')
