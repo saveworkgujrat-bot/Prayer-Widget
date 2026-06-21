@@ -20,37 +20,18 @@ jobs:
         run: |
           mkdir -p app/src/main/java/com/gujrat/prayerwidget
           mkdir -p app/src/main/res/xml app/src/main/res/layout
-          mkdir -p app/src/main/res/drawable app/src/main/res/values
+          mkdir -p app/src/main/res/values
 
-          # Copy existing files
-          cp AndroidManifest.xml app/src/main/ 2>/dev/null || true
-          cp BootReceiver.kt app/src/main/java/com/gujrat/prayerwidget/ 2>/dev/null || true
-          cp PrayerUpdateService.kt app/src/main/java/com/gujrat/prayerwidget/ 2>/dev/null || true
-          cp PrayerWidgetProvider.kt app/src/main/java/com/gujrat/prayerwidget/ 2>/dev/null || true
-          cp prayer_widget_info.xml app/src/main/res/xml/ 2>/dev/null || true
-          cp prayer_widget_layout.xml app/src/main/res/layout/ 2>/dev/null || true
-          cp schedule_bg.xml app/src/main/res/drawable/ 2>/dev/null || true
-          cp time_badge_bg.xml app/src/main/res/drawable/ 2>/dev/null || true
-          cp widget_bg.xml app/src/main/res/drawable/ 2>/dev/null || true
-          cp strings.xml app/src/main/res/values/ 2>/dev/null || true
-
-          # Recreate all files fresh to ensure correctness
           cat > app/src/main/AndroidManifest.xml << 'XML'
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <application
-        android:allowBackup="true"
-        android:label="Prayer Widget"
-        android:theme="@android:style/Theme.DeviceDefault">
+    <application android:allowBackup="true" android:label="Prayer Widget" android:theme="@android:style/Theme.DeviceDefault">
         <receiver android:name=".PrayerWidgetProvider" android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/prayer_widget_info" />
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/prayer_widget_info" />
         </receiver>
         <service android:name=".PrayerUpdateService" android:exported="false" />
         <receiver android:name=".BootReceiver" android:exported="true">
@@ -77,91 +58,100 @@ XML
 </appwidget-provider>
 XML
 
-          cat > app/src/main/res/drawable/widget_bg.xml << 'XML'
-<?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
-    <solid android:color="#CC0D1F1A"/>
-    <corners android:radius="16dp"/>
-</shape>
-XML
-
-          cat > app/src/main/res/drawable/schedule_bg.xml << 'XML'
-<?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
-    <solid android:color="#CC152820"/>
-    <corners android:radius="12dp"/>
-</shape>
-XML
-
-          cat > app/src/main/res/drawable/time_badge_bg.xml << 'XML'
-<?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
-    <solid android:color="#CC1A3D30"/>
-    <corners android:radius="6dp"/>
-</shape>
-XML
-
           cat > app/src/main/res/layout/prayer_widget_layout.xml << 'XML'
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent"
-    android:background="@drawable/widget_bg" android:padding="12dp">
-    <LinearLayout android:id="@+id/left_panel"
-        android:layout_width="0dp" android:layout_height="match_parent"
-        android:layout_toLeftOf="@+id/right_panel" android:layout_alignParentLeft="true"
-        android:orientation="vertical" android:gravity="center_vertical" android:layout_marginRight="8dp">
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="NEXT PRAYER" android:textColor="#AAAAAAAA" android:textSize="8sp"/>
-        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="2dp">
-            <TextView android:id="@+id/widget_prayer_name"
-                android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="Asr" android:textColor="#FFFFFFFF" android:textSize="18sp" android:textStyle="bold"/>
-            <TextView android:id="@+id/widget_prayer_time"
-                android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:text="5:03 PM" android:textColor="#FF10B981" android:textSize="10sp"
-                android:background="@drawable/time_badge_bg"
-                android:paddingLeft="5dp" android:paddingRight="5dp"
-                android:paddingTop="2dp" android:paddingBottom="2dp" android:layout_marginLeft="6dp"/>
-        </LinearLayout>
-        <TextView android:id="@+id/widget_countdown"
-            android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="01:49:52" android:textColor="#FFFFFFFF"
-            android:textSize="24sp" android:textStyle="bold" android:layout_marginTop="2dp"/>
-        <View android:layout_width="match_parent" android:layout_height="0.5dp"
-            android:background="#442A4A3A" android:layout_marginTop="6dp" android:layout_marginBottom="4dp"/>
-        <TextView android:id="@+id/widget_location"
-            android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="Gujrat" android:textColor="#FF10B981" android:textSize="10sp" android:textStyle="bold"/>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:padding="12dp">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="NEXT PRAYER"
+            android:textColor="#7AADA0"
+            android:textSize="9sp"/>
+
+        <TextView
+            android:id="@+id/widget_prayer_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Asr"
+            android:textColor="#FFFFFF"
+            android:textSize="22sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/widget_prayer_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="5:03 PM"
+            android:textColor="#10B981"
+            android:textSize="12sp"/>
+
+        <TextView
+            android:id="@+id/widget_countdown"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="01:49:52"
+            android:textColor="#FFFFFF"
+            android:textSize="26sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/widget_location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Gujrat"
+            android:textColor="#10B981"
+            android:textSize="11sp"
+            android:textStyle="bold"/>
     </LinearLayout>
-    <LinearLayout android:id="@+id/right_panel"
-        android:layout_width="140dp" android:layout_height="match_parent"
-        android:layout_alignParentRight="true" android:orientation="vertical"
-        android:background="@drawable/schedule_bg" android:padding="8dp">
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="TODAY SCHEDULE" android:textColor="#AAAAAAAA" android:textSize="7sp" android:layout_marginBottom="4dp"/>
+
+    <LinearLayout
+        android:layout_width="145dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TODAY SCHEDULE"
+            android:textColor="#7AADA0"
+            android:textSize="8sp"
+            android:layout_marginBottom="4dp"/>
+
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="3dp">
-            <TextView android:id="@+id/fajr_name" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Fajr" android:textColor="#CCFFFFFF" android:textSize="9sp" android:textStyle="bold"/>
-            <TextView android:id="@+id/fajr_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="3:15 AM" android:textColor="#88AAAAAA" android:textSize="9sp"/>
+            <TextView android:id="@+id/fajr_name" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Fajr" android:textColor="#CCFFFFFF" android:textSize="10sp" android:textStyle="bold"/>
+            <TextView android:id="@+id/fajr_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="3:15 AM" android:textColor="#88FFFFFF" android:textSize="10sp"/>
         </LinearLayout>
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="3dp">
-            <TextView android:id="@+id/dhuhr_name" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Dhuhr" android:textColor="#CCFFFFFF" android:textSize="9sp" android:textStyle="bold"/>
-            <TextView android:id="@+id/dhuhr_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="12:05 PM" android:textColor="#88AAAAAA" android:textSize="9sp"/>
+            <TextView android:id="@+id/dhuhr_name" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Dhuhr" android:textColor="#CCFFFFFF" android:textSize="10sp" android:textStyle="bold"/>
+            <TextView android:id="@+id/dhuhr_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="12:05 PM" android:textColor="#88FFFFFF" android:textSize="10sp"/>
         </LinearLayout>
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="3dp">
-            <TextView android:id="@+id/asr_name" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Asr" android:textColor="#CCFFFFFF" android:textSize="9sp" android:textStyle="bold"/>
-            <TextView android:id="@+id/asr_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="5:03 PM" android:textColor="#88AAAAAA" android:textSize="9sp"/>
+            <TextView android:id="@+id/asr_name" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Asr" android:textColor="#CCFFFFFF" android:textSize="10sp" android:textStyle="bold"/>
+            <TextView android:id="@+id/asr_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="5:03 PM" android:textColor="#88FFFFFF" android:textSize="10sp"/>
         </LinearLayout>
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="3dp">
-            <TextView android:id="@+id/maghrib_name" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Maghrib" android:textColor="#CCFFFFFF" android:textSize="9sp" android:textStyle="bold"/>
-            <TextView android:id="@+id/maghrib_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="7:14 PM" android:textColor="#88AAAAAA" android:textSize="9sp"/>
+            <TextView android:id="@+id/maghrib_name" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Maghrib" android:textColor="#CCFFFFFF" android:textSize="10sp" android:textStyle="bold"/>
+            <TextView android:id="@+id/maghrib_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="7:14 PM" android:textColor="#88FFFFFF" android:textSize="10sp"/>
         </LinearLayout>
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
-            <TextView android:id="@+id/isha_name" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Isha" android:textColor="#CCFFFFFF" android:textSize="9sp" android:textStyle="bold"/>
-            <TextView android:id="@+id/isha_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="8:55 PM" android:textColor="#88AAAAAA" android:textSize="9sp"/>
+            <TextView android:id="@+id/isha_name" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Isha" android:textColor="#CCFFFFFF" android:textSize="10sp" android:textStyle="bold"/>
+            <TextView android:id="@+id/isha_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="8:55 PM" android:textColor="#88FFFFFF" android:textSize="10sp"/>
         </LinearLayout>
     </LinearLayout>
-</RelativeLayout>
+</LinearLayout>
 XML
 
           cat > app/src/main/res/values/strings.xml << 'XML'
@@ -201,7 +191,12 @@ class PrayerWidgetProvider : AppWidgetProvider() {
             views.setTextViewText(R.id.widget_countdown,String.format("%02d:%02d:%02d",total/3600,(total%3600)/60,total%60))
             views.setTextViewText(R.id.widget_location,"Gujrat")
             val ids=listOf(Triple(R.id.fajr_name,R.id.fajr_time,PRAYERS[0]),Triple(R.id.dhuhr_name,R.id.dhuhr_time,PRAYERS[1]),Triple(R.id.asr_name,R.id.asr_time,PRAYERS[2]),Triple(R.id.maghrib_name,R.id.maghrib_time,PRAYERS[3]),Triple(R.id.isha_name,R.id.isha_time,PRAYERS[4]))
-            for((nId,tId,p) in ids){val c=if(p.first==next.first)0xFF10B981.toInt() else 0xCCFFFFFF.toInt();views.setTextColor(nId,c);views.setTextColor(tId,if(p.first==next.first)0xFF10B981.toInt() else 0x88AAAAAA.toInt());views.setTextViewText(tId,p.third)}
+            for((nId,tId,p) in ids){
+                val c=if(p.first==next.first)0xFF10B981.toInt() else 0xCCFFFFFF.toInt()
+                views.setTextColor(nId,c)
+                views.setTextColor(tId,if(p.first==next.first)0xFF10B981.toInt() else 0x88FFFFFF.toInt())
+                views.setTextViewText(tId,p.third)
+            }
             appWidgetManager.updateAppWidget(appWidgetId,views)
         }
     }
@@ -221,8 +216,14 @@ class PrayerUpdateService : Service() {
     private val handler=Handler(Looper.getMainLooper())
     private lateinit var runnable: Runnable
     override fun onStartCommand(intent: Intent?,flags: Int,startId: Int): Int {
-        runnable=Runnable{val mgr=AppWidgetManager.getInstance(this);val ids=mgr.getAppWidgetIds(ComponentName(this,PrayerWidgetProvider::class.java));for(id in ids)PrayerWidgetProvider.updateWidget(this,mgr,id);handler.postDelayed(runnable,1000)}
-        handler.post(runnable);return START_STICKY
+        runnable=Runnable{
+            val mgr=AppWidgetManager.getInstance(this)
+            val ids=mgr.getAppWidgetIds(ComponentName(this,PrayerWidgetProvider::class.java))
+            for(id in ids) PrayerWidgetProvider.updateWidget(this,mgr,id)
+            handler.postDelayed(runnable,1000)
+        }
+        handler.post(runnable)
+        return START_STICKY
     }
     override fun onDestroy(){handler.removeCallbacks(runnable);super.onDestroy()}
     override fun onBind(intent: Intent?): IBinder?=null
@@ -236,62 +237,16 @@ import android.content.Context
 import android.content.Intent
 class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context,intent: Intent) {
-        if(intent.action==Intent.ACTION_BOOT_COMPLETED) context.startService(Intent(context,PrayerUpdateService::class.java))
+        if(intent.action==Intent.ACTION_BOOT_COMPLETED)
+            context.startService(Intent(context,PrayerUpdateService::class.java))
     }
 }
 KT
 
-          # Gradle files
-          cat > gradle.properties << 'PROPS'
-android.useAndroidX=true
-android.enableJetifier=true
-PROPS
-
-          cat > build.gradle << 'GRADLE'
-plugins {
-    id "com.android.application" version "8.3.0" apply false
-    id "org.jetbrains.kotlin.android" version "1.9.0" apply false
-}
-GRADLE
-
-          cat > app/build.gradle << 'GRADLE'
-plugins {
-    id "com.android.application"
-    id "org.jetbrains.kotlin.android"
-}
-android {
-    namespace "com.gujrat.prayerwidget"
-    compileSdk 34
-    defaultConfig {
-        applicationId "com.gujrat.prayerwidget"
-        minSdk 26
-        targetSdk 34
-        versionCode 1
-        versionName "1.0"
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
-    }
-    kotlinOptions { jvmTarget = "17" }
-}
-dependencies {
-    implementation "androidx.core:core-ktx:1.12.0"
-    implementation "androidx.appcompat:appcompat:1.6.1"
-}
-GRADLE
-
-          cat > settings.gradle << 'GRADLE'
-pluginManagement {
-    repositories { google(); mavenCentral(); gradlePluginPortal() }
-}
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories { google(); mavenCentral() }
-}
-rootProject.name = "PrayerWidget"
-include ":app"
-GRADLE
+          printf 'android.useAndroidX=true\nandroid.enableJetifier=true\n' > gradle.properties
+          printf 'plugins {\n id "com.android.application" version "8.3.0" apply false\n id "org.jetbrains.kotlin.android" version "1.9.0" apply false\n}\n' > build.gradle
+          printf 'plugins {\n id "com.android.application"\n id "org.jetbrains.kotlin.android"\n}\nandroid {\n namespace "com.gujrat.prayerwidget"\n compileSdk 34\n defaultConfig {\n applicationId "com.gujrat.prayerwidget"\n minSdk 26\n targetSdk 34\n versionCode 1\n versionName "1.0"\n }\n compileOptions {\n sourceCompatibility JavaVersion.VERSION_17\n targetCompatibility JavaVersion.VERSION_17\n }\n kotlinOptions { jvmTarget = "17" }\n}\ndependencies {\n implementation "androidx.core:core-ktx:1.12.0"\n implementation "androidx.appcompat:appcompat:1.6.1"\n}\n' > app/build.gradle
+          printf 'pluginManagement {\n repositories { google(); mavenCentral(); gradlePluginPortal() }\n}\ndependencyResolutionManagement {\n repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)\n repositories { google(); mavenCentral() }\n}\nrootProject.name = "PrayerWidget"\ninclude ":app"\n' > settings.gradle
 
           wget -q https://services.gradle.org/distributions/gradle-8.4-bin.zip
           unzip -q gradle-8.4-bin.zip
