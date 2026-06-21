@@ -7,15 +7,62 @@ os.makedirs('app/src/main/res/layout', exist_ok=True)
 os.makedirs('app/src/main/res/values', exist_ok=True)
 os.makedirs('gradle/wrapper', exist_ok=True)
 
-open('app/src/main/AndroidManifest.xml','w').write('<?xml version="1.0" encoding="utf-8"?>\n<manifest xmlns:android="http://schemas.android.com/apk/res/android">\n    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />\n    <application android:allowBackup="true" android:label="Prayer Widget" android:theme="@android:style/Theme.DeviceDefault">\n        <receiver android:name=".PrayerWidgetProvider" android:exported="true">\n            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>\n            <meta-data android:name="android.appwidget.provider" android:resource="@xml/prayer_widget_info" />\n        </receiver>\n        <service android:name=".PrayerUpdateService" android:exported="false" />\n        <receiver android:name=".BootReceiver" android:exported="true">\n            <intent-filter><action android:name="android.intent.action.BOOT_COMPLETED" /></intent-filter>\n        </receiver>\n    </application>\n</manifest>\n')
+open('app/src/main/AndroidManifest.xml','w').write('''<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <application android:allowBackup="true" android:label="Prayer Widget" android:theme="@android:style/Theme.DeviceDefault">
 
-open('app/src/main/res/xml/prayer_widget_info.xml','w').write('<?xml version="1.0" encoding="utf-8"?>\n<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"\n    android:minWidth="250dp"\n    android:minHeight="110dp"\n    android:targetCellWidth="4"\n    android:targetCellHeight="2"\n    android:updatePeriodMillis="1800000"\n    android:initialLayout="@layout/prayer_widget_layout"\n    android:previewLayout="@layout/prayer_widget_layout"\n    android:resizeMode="horizontal|vertical"\n    android:widgetCategory="home_screen">\n</appwidget-provider>\n')
+        <receiver android:name=".PrayerWidgetProvider" android:exported="true">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/prayer_widget_info" />
+        </receiver>
 
+        <receiver android:name=".PrayerWidgetMinimal" android:exported="true">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/prayer_widget_info2" />
+        </receiver>
+
+        <receiver android:name=".PrayerWidgetFull" android:exported="true">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/prayer_widget_info3" />
+        </receiver>
+
+        <receiver android:name=".PrayerWidgetCard" android:exported="true">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/prayer_widget_info4" />
+        </receiver>
+
+        <service android:name=".PrayerUpdateService" android:exported="false" />
+        <receiver android:name=".BootReceiver" android:exported="true">
+            <intent-filter><action android:name="android.intent.action.BOOT_COMPLETED" /></intent-filter>
+        </receiver>
+    </application>
+</manifest>
+''')
+
+# Widget info files
+for i, name in [('','Prayer Widget Classic'), ('2','Prayer Widget Minimal'), ('3','Prayer Widget Full'), ('4','Prayer Widget Cards')]:
+    open(f'app/src/main/res/xml/prayer_widget_info{i}.xml','w').write(f'''<?xml version="1.0" encoding="utf-8"?>
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="250dp"
+    android:minHeight="110dp"
+    android:targetCellWidth="4"
+    android:targetCellHeight="2"
+    android:updatePeriodMillis="1800000"
+    android:initialLayout="@layout/prayer_widget_layout{i}"
+    android:previewLayout="@layout/prayer_widget_layout{i}"
+    android:resizeMode="horizontal|vertical"
+    android:widgetCategory="home_screen"
+    android:description="{name}">
+</appwidget-provider>
+''')
+
+# Layout 1 — Classic (existing)
 open('app/src/main/res/layout/prayer_widget_layout.xml','w').write(
 '<?xml version="1.0" encoding="utf-8"?>\n'
 '<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"\n'
 '    android:layout_width="match_parent" android:layout_height="match_parent"\n'
-'    android:orientation="horizontal" android:padding="12dp">\n'
+'    android:orientation="horizontal" android:padding="12dp" android:background="#CC000000">\n'
 '    <LinearLayout android:layout_width="0dp" android:layout_height="match_parent"\n'
 '        android:layout_weight="1" android:orientation="vertical" android:gravity="center_vertical">\n'
 '        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"\n'
@@ -34,23 +81,151 @@ open('app/src/main/res/layout/prayer_widget_layout.xml','w').write(
 '            android:textColor="#10B981" android:textSize="11sp" android:textStyle="bold"/>\n'
 '    </LinearLayout>\n'
 '    <LinearLayout android:layout_width="145dp" android:layout_height="match_parent"\n'
-'        android:orientation="vertical" android:gravity="center">\n'
+'        android:orientation="vertical" android:gravity="center_vertical">\n'
 '        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"\n'
 '            android:text="TODAY SCHEDULE" android:textColor="#7AADA0" android:textSize="9sp"\n'
 '            android:gravity="center" android:layout_marginBottom="5dp"/>\n'
-'        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="4dp" android:gravity="center"><TextView android:id="@+id/fajr_name" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Fajr" android:textColor="#CCFFFFFF" android:textSize="13sp" android:textStyle="bold" android:gravity="center"/><TextView android:id="@+id/fajr_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="3:15 AM" android:textColor="#88FFFFFF" android:textSize="13sp" android:gravity="center"/></LinearLayout>\n'
-'        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="4dp" android:gravity="center"><TextView android:id="@+id/dhuhr_name" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Dhuhr" android:textColor="#CCFFFFFF" android:textSize="13sp" android:textStyle="bold" android:gravity="center"/><TextView android:id="@+id/dhuhr_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="12:05 PM" android:textColor="#88FFFFFF" android:textSize="13sp" android:gravity="center"/></LinearLayout>\n'
-'        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="4dp" android:gravity="center"><TextView android:id="@+id/asr_name" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Asr" android:textColor="#CCFFFFFF" android:textSize="13sp" android:textStyle="bold" android:gravity="center"/><TextView android:id="@+id/asr_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="5:03 PM" android:textColor="#88FFFFFF" android:textSize="13sp" android:gravity="center"/></LinearLayout>\n'
-'        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="4dp" android:gravity="center"><TextView android:id="@+id/maghrib_name" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Maghrib" android:textColor="#CCFFFFFF" android:textSize="13sp" android:textStyle="bold" android:gravity="center"/><TextView android:id="@+id/maghrib_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="7:14 PM" android:textColor="#88FFFFFF" android:textSize="13sp" android:gravity="center"/></LinearLayout>\n'
-'        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center"><TextView android:id="@+id/isha_name" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Isha" android:textColor="#CCFFFFFF" android:textSize="13sp" android:textStyle="bold" android:gravity="center"/><TextView android:id="@+id/isha_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="8:55 PM" android:textColor="#88FFFFFF" android:textSize="13sp" android:gravity="center"/></LinearLayout>\n'
+'        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="4dp"><TextView android:id="@+id/fajr_name" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Fajr" android:textColor="#CCFFFFFF" android:textSize="13sp" android:textStyle="bold"/><TextView android:id="@+id/fajr_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="3:15 AM" android:textColor="#88FFFFFF" android:textSize="13sp"/></LinearLayout>\n'
+'        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="4dp"><TextView android:id="@+id/dhuhr_name" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Dhuhr" android:textColor="#CCFFFFFF" android:textSize="13sp" android:textStyle="bold"/><TextView android:id="@+id/dhuhr_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="12:05 PM" android:textColor="#88FFFFFF" android:textSize="13sp"/></LinearLayout>\n'
+'        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="4dp"><TextView android:id="@+id/asr_name" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Asr" android:textColor="#CCFFFFFF" android:textSize="13sp" android:textStyle="bold"/><TextView android:id="@+id/asr_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="5:03 PM" android:textColor="#88FFFFFF" android:textSize="13sp"/></LinearLayout>\n'
+'        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="4dp"><TextView android:id="@+id/maghrib_name" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Maghrib" android:textColor="#CCFFFFFF" android:textSize="13sp" android:textStyle="bold"/><TextView android:id="@+id/maghrib_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="7:14 PM" android:textColor="#88FFFFFF" android:textSize="13sp"/></LinearLayout>\n'
+'        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal"><TextView android:id="@+id/isha_name" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Isha" android:textColor="#CCFFFFFF" android:textSize="13sp" android:textStyle="bold"/><TextView android:id="@+id/isha_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="8:55 PM" android:textColor="#88FFFFFF" android:textSize="13sp"/></LinearLayout>\n'
 '    </LinearLayout>\n'
 '</LinearLayout>\n')
 
+# Layout 2 — Minimal
+open('app/src/main/res/layout/prayer_widget_layout2.xml','w').write('''<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:gravity="center"
+    android:padding="16dp" android:background="#CC0D1B2A">
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="NEXT PRAYER" android:textColor="#7AADA0" android:textSize="10sp" android:letterSpacing="0.2"/>
+    <TextView android:id="@+id/widget_prayer_name" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:text="Asr"
+        android:textColor="#FFFFFF" android:textSize="36sp" android:textStyle="bold"/>
+    <TextView android:id="@+id/widget_prayer_time" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:text="5:03 PM"
+        android:textColor="#10B981" android:textSize="16sp"/>
+    <TextView android:id="@+id/widget_countdown" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:text="01:49:52"
+        android:textColor="#FFFFFF" android:textSize="28sp" android:textStyle="bold" android:layout_marginTop="4dp"/>
+    <TextView android:id="@+id/widget_location" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:text="Gujrat"
+        android:textColor="#10B981" android:textSize="11sp" android:layout_marginTop="4dp"/>
+    <TextView android:id="@+id/fajr_name" android:layout_width="wrap_content" android:layout_height="wrap_content" android:visibility="gone"/>
+    <TextView android:id="@+id/fajr_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:visibility="gone"/>
+    <TextView android:id="@+id/dhuhr_name" android:layout_width="wrap_content" android:layout_height="wrap_content" android:visibility="gone"/>
+    <TextView android:id="@+id/dhuhr_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:visibility="gone"/>
+    <TextView android:id="@+id/asr_name" android:layout_width="wrap_content" android:layout_height="wrap_content" android:visibility="gone"/>
+    <TextView android:id="@+id/asr_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:visibility="gone"/>
+    <TextView android:id="@+id/maghrib_name" android:layout_width="wrap_content" android:layout_height="wrap_content" android:visibility="gone"/>
+    <TextView android:id="@+id/maghrib_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:visibility="gone"/>
+    <TextView android:id="@+id/isha_name" android:layout_width="wrap_content" android:layout_height="wrap_content" android:visibility="gone"/>
+    <TextView android:id="@+id/isha_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:visibility="gone"/>
+</LinearLayout>
+''')
+
+# Layout 3 — Full Schedule
+open('app/src/main/res/layout/prayer_widget_layout3.xml','w').write('''<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:padding="10dp" android:background="#CC0D1B2A">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="6dp">
+        <TextView android:id="@+id/widget_prayer_name" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Asr" android:textColor="#10B981" android:textSize="18sp" android:textStyle="bold"/>
+        <TextView android:id="@+id/widget_countdown" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="01:49:52" android:textColor="#FFFFFF" android:textSize="18sp" android:textStyle="bold"/>
+    </LinearLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="4dp"><TextView android:id="@+id/fajr_name" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Fajr" android:textColor="#CCFFFFFF" android:textSize="14sp" android:textStyle="bold"/><TextView android:id="@+id/fajr_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="3:15 AM" android:textColor="#88FFFFFF" android:textSize="14sp"/></LinearLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="4dp"><TextView android:id="@+id/dhuhr_name" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Dhuhr" android:textColor="#CCFFFFFF" android:textSize="14sp" android:textStyle="bold"/><TextView android:id="@+id/dhuhr_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="12:05 PM" android:textColor="#88FFFFFF" android:textSize="14sp"/></LinearLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="4dp"><TextView android:id="@+id/asr_name" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Asr" android:textColor="#CCFFFFFF" android:textSize="14sp" android:textStyle="bold"/><TextView android:id="@+id/asr_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="5:03 PM" android:textColor="#88FFFFFF" android:textSize="14sp"/></LinearLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="4dp"><TextView android:id="@+id/maghrib_name" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Maghrib" android:textColor="#CCFFFFFF" android:textSize="14sp" android:textStyle="bold"/><TextView android:id="@+id/maghrib_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="7:14 PM" android:textColor="#88FFFFFF" android:textSize="14sp"/></LinearLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal"><TextView android:id="@+id/isha_name" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Isha" android:textColor="#CCFFFFFF" android:textSize="14sp" android:textStyle="bold"/><TextView android:id="@+id/isha_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="8:55 PM" android:textColor="#88FFFFFF" android:textSize="14sp"/></LinearLayout>
+    <TextView android:id="@+id/widget_prayer_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:visibility="gone"/>
+    <TextView android:id="@+id/widget_location" android:layout_width="wrap_content" android:layout_height="wrap_content" android:visibility="gone"/>
+</LinearLayout>
+''')
+
+# Layout 4 — Cards
+open('app/src/main/res/layout/prayer_widget_layout4.xml','w').write('''<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="horizontal" android:padding="6dp" android:background="#CC0D1B2A">
+    <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:orientation="vertical" android:gravity="center" android:background="#331A5C38" android:layout_marginEnd="3dp">
+        <TextView android:id="@+id/fajr_name" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Fajr" android:textColor="#CCFFFFFF" android:textSize="13sp" android:textStyle="bold" android:gravity="center"/>
+        <TextView android:id="@+id/fajr_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="3:15 AM" android:textColor="#10B981" android:textSize="11sp" android:gravity="center"/>
+    </LinearLayout>
+    <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:orientation="vertical" android:gravity="center" android:background="#331A5C38" android:layout_marginEnd="3dp">
+        <TextView android:id="@+id/dhuhr_name" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Dhuhr" android:textColor="#CCFFFFFF" android:textSize="13sp" android:textStyle="bold" android:gravity="center"/>
+        <TextView android:id="@+id/dhuhr_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="12:05 PM" android:textColor="#10B981" android:textSize="11sp" android:gravity="center"/>
+    </LinearLayout>
+    <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:orientation="vertical" android:gravity="center" android:background="#331A5C38" android:layout_marginEnd="3dp">
+        <TextView android:id="@+id/asr_name" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Asr" android:textColor="#CCFFFFFF" android:textSize="13sp" android:textStyle="bold" android:gravity="center"/>
+        <TextView android:id="@+id/asr_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="5:03 PM" android:textColor="#10B981" android:textSize="11sp" android:gravity="center"/>
+    </LinearLayout>
+    <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:orientation="vertical" android:gravity="center" android:background="#331A5C38" android:layout_marginEnd="3dp">
+        <TextView android:id="@+id/maghrib_name" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Maghrib" android:textColor="#CCFFFFFF" android:textSize="13sp" android:textStyle="bold" android:gravity="center"/>
+        <TextView android:id="@+id/maghrib_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="7:14 PM" android:textColor="#10B981" android:textSize="11sp" android:gravity="center"/>
+    </LinearLayout>
+    <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:orientation="vertical" android:gravity="center" android:background="#331A5C38">
+        <TextView android:id="@+id/isha_name" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Isha" android:textColor="#CCFFFFFF" android:textSize="13sp" android:textStyle="bold" android:gravity="center"/>
+        <TextView android:id="@+id/isha_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="8:55 PM" android:textColor="#10B981" android:textSize="11sp" android:gravity="center"/>
+    </LinearLayout>
+    <TextView android:id="@+id/widget_prayer_name" android:layout_width="wrap_content" android:layout_height="wrap_content" android:visibility="gone"/>
+    <TextView android:id="@+id/widget_prayer_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:visibility="gone"/>
+    <TextView android:id="@+id/widget_countdown" android:layout_width="wrap_content" android:layout_height="wrap_content" android:visibility="gone"/>
+    <TextView android:id="@+id/widget_location" android:layout_width="wrap_content" android:layout_height="wrap_content" android:visibility="gone"/>
+</LinearLayout>
+''')
+
 open('app/src/main/res/values/strings.xml','w').write('<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <string name="app_name">Prayer Widget</string>\n</resources>\n')
 
-open('app/src/main/java/com/gujrat/prayerwidget/PrayerWidgetProvider.kt','w').write('package com.gujrat.prayerwidget\nimport android.appwidget.AppWidgetManager\nimport android.appwidget.AppWidgetProvider\nimport android.content.Context\nimport android.content.Intent\nimport android.widget.RemoteViews\nimport java.util.Calendar\nclass PrayerWidgetProvider : AppWidgetProvider() {\n    override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {\n        for (id in appWidgetIds) updateWidget(context, appWidgetManager, id)\n        context.startService(Intent(context, PrayerUpdateService::class.java))\n    }\n    override fun onDisabled(context: Context) { context.stopService(Intent(context, PrayerUpdateService::class.java)) }\n    companion object {\n        val PRAYERS = listOf(Triple("Fajr",3*60+15,"3:15 AM"),Triple("Dhuhr",12*60+5,"12:05 PM"),Triple("Asr",17*60+3,"5:03 PM"),Triple("Maghrib",19*60+14,"7:14 PM"),Triple("Isha",20*60+55,"8:55 PM"))\n        fun updateWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {\n            val views = RemoteViews(context.packageName, R.layout.prayer_widget_layout)\n            val cal = Calendar.getInstance()\n            val now = cal.get(Calendar.HOUR_OF_DAY)*60+cal.get(Calendar.MINUTE)\n            val sec = cal.get(Calendar.SECOND)\n            var next = PRAYERS[0]; var diff = Int.MAX_VALUE\n            for (p in PRAYERS) { val d=p.second-now; if(d>0&&d<diff){diff=d;next=p} }\n            if(diff==Int.MAX_VALUE){next=PRAYERS[0];diff=1440-now+PRAYERS[0].second}\n            val total=diff*60-sec\n            views.setTextViewText(R.id.widget_prayer_name,next.first)\n            views.setTextViewText(R.id.widget_prayer_time,next.third)\n            views.setTextViewText(R.id.widget_countdown,String.format("%02d:%02d:%02d",total/3600,(total%3600)/60,total%60))\n            views.setTextViewText(R.id.widget_location,"Gujrat")\n            val ids=listOf(Triple(R.id.fajr_name,R.id.fajr_time,PRAYERS[0]),Triple(R.id.dhuhr_name,R.id.dhuhr_time,PRAYERS[1]),Triple(R.id.asr_name,R.id.asr_time,PRAYERS[2]),Triple(R.id.maghrib_name,R.id.maghrib_time,PRAYERS[3]),Triple(R.id.isha_name,R.id.isha_time,PRAYERS[4]))\n            for((nId,tId,p) in ids){val c=if(p.first==next.first)0xFF10B981.toInt() else 0xCCFFFFFF.toInt();views.setTextColor(nId,c);views.setTextColor(tId,if(p.first==next.first)0xFF10B981.toInt() else 0x88FFFFFF.toInt());views.setTextViewText(tId,p.third)}\n            appWidgetManager.updateAppWidget(appWidgetId,views)\n        }\n    }\n}\n')
+# All 4 widget providers
+kt_common = '''package com.gujrat.prayerwidget
+import android.appwidget.AppWidgetManager
+import android.appwidget.AppWidgetProvider
+import android.content.Context
+import android.content.Intent
+import android.widget.RemoteViews
+import java.util.Calendar
+'''
 
-open('app/src/main/java/com/gujrat/prayerwidget/PrayerUpdateService.kt','w').write('package com.gujrat.prayerwidget\nimport android.app.Service\nimport android.appwidget.AppWidgetManager\nimport android.content.ComponentName\nimport android.content.Intent\nimport android.os.Handler\nimport android.os.IBinder\nimport android.os.Looper\nclass PrayerUpdateService : Service() {\n    private val handler=Handler(Looper.getMainLooper())\n    private lateinit var runnable: Runnable\n    override fun onStartCommand(intent: Intent?,flags: Int,startId: Int): Int {\n        runnable=Runnable{val mgr=AppWidgetManager.getInstance(this);val ids=mgr.getAppWidgetIds(ComponentName(this,PrayerWidgetProvider::class.java));for(id in ids)PrayerWidgetProvider.updateWidget(this,mgr,id);handler.postDelayed(runnable,1000)}\n        handler.post(runnable);return START_STICKY\n    }\n    override fun onDestroy(){handler.removeCallbacks(runnable);super.onDestroy()}\n    override fun onBind(intent: Intent?): IBinder?=null\n}\n')
+update_fn = '''
+    companion object {
+        val PRAYERS = listOf(Triple("Fajr",3*60+15,"3:15 AM"),Triple("Dhuhr",12*60+5,"12:05 PM"),Triple("Asr",17*60+3,"5:03 PM"),Triple("Maghrib",19*60+14,"7:14 PM"),Triple("Isha",20*60+55,"8:55 PM"))
+        fun updateWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int, layout: Int) {
+            val views = RemoteViews(context.packageName, layout)
+            val cal = Calendar.getInstance()
+            val now = cal.get(Calendar.HOUR_OF_DAY)*60+cal.get(Calendar.MINUTE)
+            val sec = cal.get(Calendar.SECOND)
+            var next = PRAYERS[0]; var diff = Int.MAX_VALUE
+            for (p in PRAYERS) { val d=p.second-now; if(d>0&&d<diff){diff=d;next=p} }
+            if(diff==Int.MAX_VALUE){next=PRAYERS[0];diff=1440-now+PRAYERS[0].second}
+            val total=diff*60-sec
+            views.setTextViewText(R.id.widget_prayer_name,next.first)
+            views.setTextViewText(R.id.widget_prayer_time,next.third)
+            views.setTextViewText(R.id.widget_countdown,String.format("%02d:%02d:%02d",total/3600,(total%3600)/60,total%60))
+            views.setTextViewText(R.id.widget_location,"Gujrat")
+            val ids=listOf(Triple(R.id.fajr_name,R.id.fajr_time,PRAYERS[0]),Triple(R.id.dhuhr_name,R.id.dhuhr_time,PRAYERS[1]),Triple(R.id.asr_name,R.id.asr_time,PRAYERS[2]),Triple(R.id.maghrib_name,R.id.maghrib_time,PRAYERS[3]),Triple(R.id.isha_name,R.id.isha_time,PRAYERS[4]))
+            for((nId,tId,p) in ids){views.setTextColor(nId,if(p.first==next.first)0xFF10B981.toInt() else 0xCCFFFFFF.toInt());views.setTextColor(tId,if(p.first==next.first)0xFF10B981.toInt() else 0x88FFFFFF.toInt());views.setTextViewText(tId,p.third)}
+            appWidgetManager.updateAppWidget(appWidgetId,views)
+        }
+    }
+'''
+
+for cls, layout in [('PrayerWidgetProvider','R.layout.prayer_widget_layout'),('PrayerWidgetMinimal','R.layout.prayer_widget_layout2'),('PrayerWidgetFull','R.layout.prayer_widget_layout3'),('PrayerWidgetCard','R.layout.prayer_widget_layout4')]:
+    open(f'app/src/main/java/com/gujrat/prayerwidget/{cls}.kt','w').write(
+        kt_common +
+        f'class {cls} : AppWidgetProvider() {{\n'
+        f'    override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {{\n'
+        f'        for (id in appWidgetIds) updateWidget(context, appWidgetManager, id, {layout})\n'
+        f'        context.startService(Intent(context, PrayerUpdateService::class.java))\n'
+        f'    }}\n'
+        f'    override fun onDisabled(context: Context) {{ context.stopService(Intent(context, PrayerUpdateService::class.java)) }}\n'
+        + update_fn +
+        '}\n'
+    )
+
+open('app/src/main/java/com/gujrat/prayerwidget/PrayerUpdateService.kt','w').write('package com.gujrat.prayerwidget\nimport android.app.Service\nimport android.appwidget.AppWidgetManager\nimport android.content.ComponentName\nimport android.content.Intent\nimport android.os.Handler\nimport android.os.IBinder\nimport android.os.Looper\nclass PrayerUpdateService : Service() {\n    private val handler=Handler(Looper.getMainLooper())\n    private lateinit var runnable: Runnable\n    override fun onStartCommand(intent: Intent?,flags: Int,startId: Int): Int {\n        runnable=Runnable{\n            val mgr=AppWidgetManager.getInstance(this)\n            for(cls in listOf(PrayerWidgetProvider::class.java,PrayerWidgetMinimal::class.java,PrayerWidgetFull::class.java,PrayerWidgetCard::class.java)){\n                val ids=mgr.getAppWidgetIds(ComponentName(this,cls))\n            }\n            handler.postDelayed(runnable,1000)}\n        handler.post(runnable);return START_STICKY\n    }\n    override fun onDestroy(){handler.removeCallbacks(runnable);super.onDestroy()}\n    override fun onBind(intent: Intent?): IBinder?=null\n}\n')
 
 open('app/src/main/java/com/gujrat/prayerwidget/BootReceiver.kt','w').write('package com.gujrat.prayerwidget\nimport android.content.BroadcastReceiver\nimport android.content.Context\nimport android.content.Intent\nclass BootReceiver : BroadcastReceiver() {\n    override fun onReceive(context: Context,intent: Intent) {\n        if(intent.action==Intent.ACTION_BOOT_COMPLETED) context.startService(Intent(context,PrayerUpdateService::class.java))\n    }\n}\n')
 
