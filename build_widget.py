@@ -41,21 +41,23 @@ open('app/src/main/AndroidManifest.xml','w').write('''<?xml version="1.0" encodi
 ''')
 
 # Widget info files
-for i, name in [('','Prayer Widget Classic'), ('2','Prayer Widget Minimal'), ('3','Prayer Widget Full'), ('4','Prayer Widget Cards')]:
-    open(f'app/src/main/res/xml/prayer_widget_info{i}.xml','w').write(f'''<?xml version="1.0" encoding="utf-8"?>
-<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
-    android:minWidth="250dp"
-    android:minHeight="110dp"
-    android:targetCellWidth="4"
-    android:targetCellHeight="2"
-    android:updatePeriodMillis="1800000"
-    android:initialLayout="@layout/prayer_widget_layout{i}"
-    android:previewLayout="@layout/prayer_widget_layout{i}"
-    android:resizeMode="horizontal|vertical"
-    android:widgetCategory="home_screen"
-    android:description="{name}">
-</appwidget-provider>
-''')
+widgets = [('','widget_desc_classic'),('2','widget_desc_minimal'),('3','widget_desc_full'),('4','widget_desc_cards')]
+for idx, desc in widgets:
+    xml = '<?xml version="1.0" encoding="utf-8"?>\n'
+    xml += '<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"\n'
+    xml += '    android:minWidth="250dp"\n'
+    xml += '    android:minHeight="110dp"\n'
+    xml += '    android:targetCellWidth="4"\n'
+    xml += '    android:targetCellHeight="2"\n'
+    xml += '    android:updatePeriodMillis="1800000"\n'
+    xml += f'    android:initialLayout="@layout/prayer_widget_layout{idx}"\n'
+    xml += f'    android:previewLayout="@layout/prayer_widget_layout{idx}"\n'
+    xml += '    android:resizeMode="horizontal|vertical"\n'
+    xml += '    android:widgetCategory="home_screen"\n'
+    xml += f'    android:description="@string/{desc}">\n'
+    xml += '</appwidget-provider>\n'
+    open(f'app/src/main/res/xml/prayer_widget_info{idx}.xml','w').write(xml)
+
 
 # Layout 1 — Classic (existing)
 open('app/src/main/res/layout/prayer_widget_layout.xml','w').write(
