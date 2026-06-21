@@ -7,9 +7,35 @@ os.makedirs('app/src/main/res/layout', exist_ok=True)
 os.makedirs('app/src/main/res/values', exist_ok=True)
 os.makedirs('gradle/wrapper', exist_ok=True)
 
-open('app/src/main/AndroidManifest.xml','w').write('<?xml version="1.0" encoding="utf-8"?>\n<manifest xmlns:android="http://schemas.android.com/apk/res/android">\n    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />\n    <application android:allowBackup="true" android:label="Prayer Widget" android:theme="@android:style/Theme.DeviceDefault">\n        <receiver android:name=".PrayerWidgetProvider" android:exported="true">\n            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>\n            <meta-data android:name="android.appwidget.provider" android:resource="@xml/prayer_widget_info" />\n        </receiver>\n        <service android:name=".PrayerUpdateService" android:exported="false" />\n        <receiver android:name=".BootReceiver" android:exported="true">\n            <intent-filter><action android:name="android.intent.action.BOOT_COMPLETED" /></intent-filter>\n        </receiver>\n    </application>\n</manifest>\n')
+open('app/src/main/AndroidManifest.xml','w').write(
+'<?xml version="1.0" encoding="utf-8"?>\n'
+'<manifest xmlns:android="http://schemas.android.com/apk/res/android">\n'
+'    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />\n'
+'    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />\n'
+'    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />\n'
+'    <application android:allowBackup="true" android:label="Prayer Widget" android:theme="@android:style/Theme.DeviceDefault">\n'
+'        <receiver android:name=".PrayerWidgetProvider" android:exported="true">\n'
+'            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>\n'
+'            <intent-filter><action android:name="com.gujrat.prayerwidget.UPDATE" /></intent-filter>\n'
+'            <meta-data android:name="android.appwidget.provider" android:resource="@xml/prayer_widget_info" />\n'
+'        </receiver>\n'
+'        <receiver android:name=".BootReceiver" android:exported="true">\n'
+'            <intent-filter><action android:name="android.intent.action.BOOT_COMPLETED" /></intent-filter>\n'
+'        </receiver>\n'
+'    </application>\n'
+'</manifest>\n')
 
-open('app/src/main/res/xml/prayer_widget_info.xml','w').write('<?xml version="1.0" encoding="utf-8"?>\n<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"\n    android:minWidth="250dp"\n    android:minHeight="110dp"\n    android:targetCellWidth="4"\n    android:targetCellHeight="2"\n    android:updatePeriodMillis="1800000"\n    android:initialLayout="@layout/prayer_widget_layout"\n    android:previewLayout="@layout/prayer_widget_layout"\n    android:resizeMode="horizontal|vertical"\n    android:widgetCategory="home_screen">\n</appwidget-provider>\n')
+open('app/src/main/res/xml/prayer_widget_info.xml','w').write(
+'<?xml version="1.0" encoding="utf-8"?>\n'
+'<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"\n'
+'    android:minWidth="250dp" android:minHeight="110dp"\n'
+'    android:targetCellWidth="4" android:targetCellHeight="2"\n'
+'    android:updatePeriodMillis="1800000"\n'
+'    android:initialLayout="@layout/prayer_widget_layout"\n'
+'    android:previewLayout="@layout/prayer_widget_layout"\n'
+'    android:resizeMode="horizontal|vertical"\n'
+'    android:widgetCategory="home_screen">\n'
+'</appwidget-provider>\n')
 
 open('app/src/main/res/layout/prayer_widget_layout.xml','w').write(
 '<?xml version="1.0" encoding="utf-8"?>\n'
@@ -46,70 +72,59 @@ open('app/src/main/res/layout/prayer_widget_layout.xml','w').write(
 '    </LinearLayout>\n'
 '</LinearLayout>\n')
 
-open('app/src/main/res/values/strings.xml','w').write('<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <string name="app_name">Prayer Widget</string>\n</resources>\n')
+open('app/src/main/res/values/strings.xml','w').write(
+'<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <string name="app_name">Prayer Widget</string>\n</resources>\n')
 
 open('app/src/main/java/com/gujrat/prayerwidget/PrayerWidgetProvider.kt','w').write(
 'package com.gujrat.prayerwidget\n'
-'import android.appwidget.AppWidgetManager\n'
-'import android.appwidget.AppWidgetProvider\n'
-'import android.content.Context\n'
-'import android.content.Intent\n'
-'import android.widget.RemoteViews\n'
-'import java.util.Calendar\n'
-'import kotlin.math.*\n'
+'import android.app.AlarmManager\nimport android.app.PendingIntent\n'
+'import android.appwidget.AppWidgetManager\nimport android.appwidget.AppWidgetProvider\n'
+'import android.content.Context\nimport android.content.Intent\nimport android.widget.RemoteViews\n'
+'import java.util.Calendar\nimport kotlin.math.*\n'
 'class PrayerWidgetProvider : AppWidgetProvider() {\n'
 '    override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {\n'
 '        for (id in appWidgetIds) updateWidget(context, appWidgetManager, id)\n'
-'        context.startService(Intent(context, PrayerUpdateService::class.java))\n'
+'        scheduleUpdate(context)\n'
 '    }\n'
-'    override fun onDisabled(context: Context) { context.stopService(Intent(context, PrayerUpdateService::class.java)) }\n'
+'    override fun onDisabled(context: Context) {\n'
+'        val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager\n'
+'        val pi = PendingIntent.getBroadcast(context,0,Intent("com.gujrat.prayerwidget.UPDATE"),PendingIntent.FLAG_IMMUTABLE)\n'
+'        am.cancel(pi)\n'
+'    }\n'
 '    companion object {\n'
-'        const val LAT = 32.5736\n'
-'        const val LNG = 74.0874\n'
-'        const val TZ = 5.0\n'
+'        const val LAT = 32.5736; const val LNG = 74.0874; const val TZ = 5.0\n'
+'        fun scheduleUpdate(context: Context) {\n'
+'            val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager\n'
+'            val intent = Intent("com.gujrat.prayerwidget.UPDATE")\n'
+'            intent.setClass(context, PrayerWidgetProvider::class.java)\n'
+'            val pi = PendingIntent.getBroadcast(context,0,intent,PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)\n'
+'            am.setRepeating(AlarmManager.RTC, System.currentTimeMillis()+1000, 1000, pi)\n'
+'        }\n'
 '        fun calcPrayerTimes(cal: Calendar): List<Triple<String,Int,String>> {\n'
-'            val y = cal.get(Calendar.YEAR)\n'
-'            val m = cal.get(Calendar.MONTH)+1\n'
-'            val d = cal.get(Calendar.DAY_OF_MONTH)\n'
-'            val jd = 367.0*y - (7*(y+(m+9)/12)/4) + (275*m/9) + d + 1721013.5\n'
-'            val D = jd - 2451545.0\n'
-'            val g = Math.toRadians(357.529 + 0.98560028*D)\n'
-'            val L = 280.459 + 0.98564736*D\n'
-'            val lam = Math.toRadians(L + 1.9148*sin(g) + 0.02*sin(2*g))\n'
-'            val ep = Math.toRadians(23.439 - 0.00000036*D)\n'
-'            val RA = Math.toDegrees(atan2(cos(ep)*sin(lam), cos(lam)))/15.0\n'
-'            val decl = Math.toDegrees(asin(sin(ep)*sin(lam)))\n'
-'            val eqT = (L - 0.0057183 - RA*15)/15.0\n'
-'            val noon = 12.0 + TZ - LNG/15.0 - eqT\n'
-'            fun hourAngle(angle: Double): Double {\n'
-'                val cosH = (sin(Math.toRadians(angle)) - sin(Math.toRadians(LAT))*sin(Math.toRadians(decl))) / (cos(Math.toRadians(LAT))*cos(Math.toRadians(decl)))\n'
-'                return Math.toDegrees(acos(cosH.coerceIn(-1.0,1.0)))/15.0\n'
-'            }\n'
-'            val fajr = noon - hourAngle(-18.0)\n'
-'            val dhuhr = noon\n'
-'            val asrAngle = Math.toDegrees(atan(1.0 + tan(Math.toRadians(abs(LAT - decl)))))\n'
-'            val cosAsr = (sin(Math.toRadians(90.0-asrAngle)) - sin(Math.toRadians(LAT))*sin(Math.toRadians(decl))) / (cos(Math.toRadians(LAT))*cos(Math.toRadians(decl)))\n'
-'            val asr = noon + Math.toDegrees(acos(cosAsr.coerceIn(-1.0,1.0)))/15.0\n'
-'            val maghrib = noon + hourAngle(-0.833)\n'
-'            val isha = noon + hourAngle(-18.0)\n'
-'            fun fmt(t: Double): Pair<Int,String> {\n'
-'                val tt = ((t % 24) + 24) % 24\n'
-'                val h = tt.toInt(); val min = ((tt-h)*60).toInt()\n'
-'                val ampm = if(h<12) "AM" else "PM"\n'
-'                val h12 = if(h%12==0) 12 else h%12\n'
-'                return Pair(h*60+min, "$h12:${min.toString().padStart(2,\'0\')} $ampm")\n'
-'            }\n'
-'            val (fm,fs)=fmt(fajr); val (dm,ds)=fmt(dhuhr); val (am,as_)=fmt(asr); val (mm,ms)=fmt(maghrib); val (im,is_)=fmt(isha)\n'
-'            return listOf(Triple("Fajr",fm,fs),Triple("Dhuhr",dm,ds),Triple("Asr",am,as_),Triple("Maghrib",mm,ms),Triple("Isha",im,is_))\n'
+'            val y=cal.get(Calendar.YEAR); val m=cal.get(Calendar.MONTH)+1; val d=cal.get(Calendar.DAY_OF_MONTH)\n'
+'            val jd=367.0*y-(7*(y+(m+9)/12)/4)+(275*m/9)+d+1721013.5\n'
+'            val D=jd-2451545.0; val g=Math.toRadians(357.529+0.98560028*D)\n'
+'            val L=280.459+0.98564736*D; val lam=Math.toRadians(L+1.9148*sin(g)+0.02*sin(2*g))\n'
+'            val ep=Math.toRadians(23.439-0.00000036*D)\n'
+'            val RA=Math.toDegrees(atan2(cos(ep)*sin(lam),cos(lam)))/15.0\n'
+'            val decl=Math.toDegrees(asin(sin(ep)*sin(lam)))\n'
+'            val eqT=(L-0.0057183-RA*15)/15.0; val noon=12.0+TZ-LNG/15.0-eqT\n'
+'            fun ha(angle: Double): Double { val c=(sin(Math.toRadians(angle))-sin(Math.toRadians(LAT))*sin(Math.toRadians(decl)))/(cos(Math.toRadians(LAT))*cos(Math.toRadians(decl))); return Math.toDegrees(acos(c.coerceIn(-1.0,1.0)))/15.0 }\n'
+'            val fajr=noon-ha(-18.0); val dhuhr=noon\n'
+'            val asrA=Math.toDegrees(atan(1.0+tan(Math.toRadians(abs(LAT-decl)))))\n'
+'            val cA=(sin(Math.toRadians(90.0-asrA))-sin(Math.toRadians(LAT))*sin(Math.toRadians(decl)))/(cos(Math.toRadians(LAT))*cos(Math.toRadians(decl)))\n'
+'            val asr=noon+Math.toDegrees(acos(cA.coerceIn(-1.0,1.0)))/15.0\n'
+'            val maghrib=noon+ha(-0.833); val isha=noon+ha(-18.0)\n'
+'            fun fmt(t: Double): Pair<Int,String> { val tt=((t%24)+24)%24; val h=tt.toInt(); val min=((tt-h)*60).toInt(); val ap=if(h<12)"AM" else "PM"; val h12=if(h%12==0)12 else h%12; return Pair(h*60+min,"$h12:${min.toString().padStart(2,\'0\')} $ap") }\n'
+'            val(fm,fs)=fmt(fajr);val(dm,ds)=fmt(dhuhr);val(am2,as2)=fmt(asr);val(mm,ms)=fmt(maghrib);val(im,is2)=fmt(isha)\n'
+'            return listOf(Triple("Fajr",fm,fs),Triple("Dhuhr",dm,ds),Triple("Asr",am2,as2),Triple("Maghrib",mm,ms),Triple("Isha",im,is2))\n'
 '        }\n'
 '        fun updateWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {\n'
-'            val views = RemoteViews(context.packageName, R.layout.prayer_widget_layout)\n'
-'            val cal = Calendar.getInstance()\n'
-'            val prayers = calcPrayerTimes(cal)\n'
-'            val now = cal.get(Calendar.HOUR_OF_DAY)*60+cal.get(Calendar.MINUTE)\n'
-'            val sec = cal.get(Calendar.SECOND)\n'
-'            var next = prayers[0]; var diff = Int.MAX_VALUE\n'
-'            for (p in prayers) { val d=p.second-now; if(d>0&&d<diff){diff=d;next=p} }\n'
+'            val views=RemoteViews(context.packageName,R.layout.prayer_widget_layout)\n'
+'            val cal=Calendar.getInstance(); val prayers=calcPrayerTimes(cal)\n'
+'            val now=cal.get(Calendar.HOUR_OF_DAY)*60+cal.get(Calendar.MINUTE); val sec=cal.get(Calendar.SECOND)\n'
+'            var next=prayers[0]; var diff=Int.MAX_VALUE\n'
+'            for(p in prayers){val d=p.second-now;if(d>0&&d<diff){diff=d;next=p}}\n'
 '            if(diff==Int.MAX_VALUE){next=prayers[0];diff=1440-now+prayers[0].second}\n'
 '            val total=diff*60-sec\n'
 '            views.setTextViewText(R.id.widget_prayer_name,next.first)\n'
@@ -123,9 +138,20 @@ open('app/src/main/java/com/gujrat/prayerwidget/PrayerWidgetProvider.kt','w').wr
 '    }\n'
 '}\n')
 
-open('app/src/main/java/com/gujrat/prayerwidget/PrayerUpdateService.kt','w').write('package com.gujrat.prayerwidget\nimport android.app.Service\nimport android.appwidget.AppWidgetManager\nimport android.content.ComponentName\nimport android.content.Intent\nimport android.os.Handler\nimport android.os.IBinder\nimport android.os.Looper\nclass PrayerUpdateService : Service() {\n    private val handler=Handler(Looper.getMainLooper())\n    private lateinit var runnable: Runnable\n    override fun onStartCommand(intent: Intent?,flags: Int,startId: Int): Int {\n        runnable=Runnable{val mgr=AppWidgetManager.getInstance(this);val ids=mgr.getAppWidgetIds(ComponentName(this,PrayerWidgetProvider::class.java));for(id in ids)PrayerWidgetProvider.updateWidget(this,mgr,id);handler.postDelayed(runnable,1000)}\n        handler.post(runnable);return START_STICKY\n    }\n    override fun onDestroy(){handler.removeCallbacks(runnable);super.onDestroy()}\n    override fun onBind(intent: Intent?): IBinder?=null\n}\n')
-
-open('app/src/main/java/com/gujrat/prayerwidget/BootReceiver.kt','w').write('package com.gujrat.prayerwidget\nimport android.content.BroadcastReceiver\nimport android.content.Context\nimport android.content.Intent\nclass BootReceiver : BroadcastReceiver() {\n    override fun onReceive(context: Context,intent: Intent) {\n        if(intent.action==Intent.ACTION_BOOT_COMPLETED) context.startService(Intent(context,PrayerUpdateService::class.java))\n    }\n}\n')
+open('app/src/main/java/com/gujrat/prayerwidget/BootReceiver.kt','w').write(
+'package com.gujrat.prayerwidget\n'
+'import android.appwidget.AppWidgetManager\nimport android.content.BroadcastReceiver\n'
+'import android.content.ComponentName\nimport android.content.Context\nimport android.content.Intent\n'
+'class BootReceiver : BroadcastReceiver() {\n'
+'    override fun onReceive(context: Context, intent: Intent) {\n'
+'        if(intent.action==Intent.ACTION_BOOT_COMPLETED) {\n'
+'            val mgr=AppWidgetManager.getInstance(context)\n'
+'            val ids=mgr.getAppWidgetIds(ComponentName(context,PrayerWidgetProvider::class.java))\n'
+'            for(id in ids) PrayerWidgetProvider.updateWidget(context,mgr,id)\n'
+'            PrayerWidgetProvider.scheduleUpdate(context)\n'
+'        }\n'
+'    }\n'
+'}\n')
 
 open('gradle.properties','w').write('android.useAndroidX=true\nandroid.enableJetifier=true\n')
 open('build.gradle','w').write('plugins {\n id "com.android.application" version "8.3.0" apply false\n id "org.jetbrains.kotlin.android" version "1.9.0" apply false\n}\n')
@@ -135,4 +161,4 @@ open('gradle/wrapper/gradle-wrapper.properties','w').write('distributionBase=GRA
 
 urllib.request.urlretrieve('https://raw.githubusercontent.com/gradle/gradle/v8.4.0/gradlew','gradlew')
 os.chmod('gradlew',0o755)
-print('All files created!')
+print('Done!')
