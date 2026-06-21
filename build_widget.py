@@ -177,11 +177,7 @@ open('app/src/main/res/layout/prayer_widget_layout4.xml','w').write('''<?xml ver
 </LinearLayout>
 ''')
 
-open('app/src/main/res/values/strings.xml','w').write('<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <string name="app_name">Prayer Widget</string>
-    <string name="widget_desc_classic">Classic Style</string>
-    <string name="widget_desc_minimal">Minimal Style</string>
-    <string name="widget_desc_full">Full Schedule</string>
-    <string name="widget_desc_cards">Cards Style</string>\n</resources>\n')
+open('app/src/main/res/values/strings.xml','w').write('<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <string name="app_name">Prayer Widget</string>\n    <string name="widget_desc_classic">Classic Style</string>\n    <string name="widget_desc_minimal">Minimal Style</string>\n    <string name="widget_desc_full">Full Schedule</string>\n    <string name="widget_desc_cards">Cards Style</string>\n</resources>\n')
 
 # All 4 widget providers
 kt_common = '''package com.gujrat.prayerwidget
