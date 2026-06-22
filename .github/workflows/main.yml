@@ -1,10 +1,8 @@
 name: Build Prayer Widget APK
-
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "master" ]
   workflow_dispatch:
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -16,14 +14,20 @@ jobs:
           java-version: '17'
       - uses: android-actions/setup-android@v3
 
+      - name: Download Jameel Noori Font
+        run: |
+          mkdir -p app/src/main/res/font
+          wget -q "https://github.com/INT-NIT/DigitalMushaf/raw/master/app/src/main/res/font/jameel_noori_nastaleeq.ttf" -O app/src/main/res/font/jameel_noori.ttf || \
+          wget -q "https://www.urdustopics.com/wp-content/uploads/2019/01/Jameel-Noori-Nastaleeq.ttf" -O app/src/main/res/font/jameel_noori.ttf || \
+          echo "Font download attempted"
+
       - name: Create Project Files
         run: python3 build_widget.py
 
       - name: Build APK
         run: |
-          wget -q https://services.gradle.org/distributions/gradle-8.4-bin.zip
-          unzip -q gradle-8.4-bin.zip
-          ./gradle-8.4/bin/gradle assembleDebug --no-daemon
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
 
       - uses: actions/upload-artifact@v4
         with:
