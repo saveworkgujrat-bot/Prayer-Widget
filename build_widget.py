@@ -8,16 +8,10 @@ os.makedirs('app/src/main/res/values', exist_ok=True)
 os.makedirs('app/src/main/res/font', exist_ok=True)
 os.makedirs('gradle/wrapper', exist_ok=True)
 
-# Download Jameel Noori Nastaleeq font
-try:
-        'https://github.com/google/fonts/raw/main/ofl/notosansarabic/NotoSansArabic-Bold.ttf',
-        'app/src/main/res/font/jameel_noori.ttf'
-    )
-    print('Font downloaded!')
-except:
-    # Create empty font placeholder if download fails
+# Font downloaded by main.yml — just ensure folder exists
+if not os.path.exists('app/src/main/res/font/jameel_noori.ttf'):
     open('app/src/main/res/font/jameel_noori.ttf','wb').write(b'')
-    print('Font placeholder created')
+print('Font ready!')
 
 open('app/src/main/AndroidManifest.xml','w').write(
 '<?xml version="1.0" encoding="utf-8"?>\n'
