@@ -10,7 +10,6 @@ os.makedirs('gradle/wrapper', exist_ok=True)
 
 # Download Jameel Noori Nastaleeq font
 try:
-    urllib.request.urlretrieve(
         'https://github.com/google/fonts/raw/main/ofl/notosansarabic/NotoSansArabic-Bold.ttf',
         'app/src/main/res/font/jameel_noori.ttf'
     )
@@ -231,6 +230,5 @@ open('app/build.gradle','w').write('plugins {\n id "com.android.application"\n i
 open('settings.gradle','w').write('pluginManagement {\n repositories { google(); mavenCentral(); gradlePluginPortal() }\n}\ndependencyResolutionManagement {\n repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)\n repositories { google(); mavenCentral() }\n}\nrootProject.name = "PrayerWidget"\ninclude ":app"\n')
 open('gradle/wrapper/gradle-wrapper.properties','w').write('distributionBase=GRADLE_USER_HOME\ndistributionPath=wrapper/dists\ndistributionUrl=https\\://services.gradle.org/distributions/gradle-8.4-bin.zip\nzipStoreBase=GRADLE_USER_HOME\nzipStorePath=wrapper/dists\n')
 
-urllib.request.urlretrieve('https://raw.githubusercontent.com/gradle/gradle/v8.4.0/gradlew','gradlew')
 os.chmod('gradlew',0o755)
 print('Done!')
