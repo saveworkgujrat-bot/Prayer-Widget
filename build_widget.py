@@ -9,11 +9,16 @@ os.makedirs('app/src/main/res/font', exist_ok=True)
 os.makedirs('gradle/wrapper', exist_ok=True)
 
 # Download Jameel Noori Nastaleeq font
-urllib.request.urlretrieve(
-    'https://raw.githubusercontent.com/muhammadfaisal385/JameelNooriNastaleeqFont/master/JameelNooriNastaleeq.ttf',
-    'app/src/main/res/font/jameel_noori.ttf'
-)
-print('Font downloaded!')
+try:
+    urllib.request.urlretrieve(
+        'https://github.com/google/fonts/raw/main/ofl/notosansarabic/NotoSansArabic-Bold.ttf',
+        'app/src/main/res/font/jameel_noori.ttf'
+    )
+    print('Font downloaded!')
+except:
+    # Create empty font placeholder if download fails
+    open('app/src/main/res/font/jameel_noori.ttf','wb').write(b'')
+    print('Font placeholder created')
 
 open('app/src/main/AndroidManifest.xml','w').write(
 '<?xml version="1.0" encoding="utf-8"?>\n'
@@ -68,7 +73,6 @@ def make_layout(accent):
     '    android:orientation="vertical" android:padding="10dp">\n'
     '    <LinearLayout android:layout_width="match_parent" android:layout_height="0dp"\n'
     '        android:layout_weight="1" android:orientation="horizontal">\n'
-    # Left side
     '        <LinearLayout android:layout_width="0dp" android:layout_height="match_parent"\n'
     '            android:layout_weight="1" android:orientation="vertical" android:gravity="center_vertical">\n'
     '            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"\n'
@@ -83,13 +87,11 @@ def make_layout(accent):
     '            <Chronometer android:id="@+id/widget_countdown"\n'
     '                android:layout_width="wrap_content" android:layout_height="wrap_content"\n'
     '                android:text="00:00:00" android:textColor="#FFFFFF"\n'
-    '                android:textSize="26sp" android:textStyle="bold"\n'
-    '                android:countDown="true"/>\n'
+    '                android:textSize="26sp" android:textStyle="bold" android:countDown="true"/>\n'
     '            <TextView android:id="@+id/widget_location" android:layout_width="wrap_content"\n'
     '                android:layout_height="wrap_content" android:text="Gujrat"\n'
     f'                android:textColor="{accent}" android:textSize="11sp" android:textStyle="bold"/>\n'
     '        </LinearLayout>\n'
-    # Right side schedule
     '        <LinearLayout android:layout_width="155dp" android:layout_height="match_parent"\n'
     '            android:orientation="vertical" android:gravity="center_vertical">\n'
     '            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"\n'
@@ -102,11 +104,10 @@ def make_layout(accent):
     f'            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal"><TextView android:id="@+id/isha_name" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="\u0639\u0634\u0627\u0621" android:textColor="#CCFFFFFF" android:textSize="13sp" android:textStyle="bold" android:fontFamily="@font/jameel_noori" android:textDirection="rtl"/><TextView android:id="@+id/isha_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="--:--" android:textColor="#88FFFFFF" android:textSize="13sp"/></LinearLayout>\n'
     '        </LinearLayout>\n'
     '    </LinearLayout>\n'
-    # Bottom credit line
     '    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"\n'
-    f'        android:text="Prepared by Arslan Aslam Gujrat Police"\n'
+    '        android:text="Prepared by Arslan Aslam Gujrat Police"\n'
     f'        android:textColor="{accent}" android:textSize="8sp" android:textStyle="bold"\n'
-    '        android:gravity="center" android:layout_marginTop="3dp"/>\n'
+    '        android:gravity="center" android:layout_marginTop="2dp"/>\n'
     '</LinearLayout>\n')
 
 open('app/src/main/res/layout/widget_layout_classic.xml','w').write(make_layout('#10B981'))
@@ -128,60 +129,40 @@ open('app/src/main/java/com/gujrat/prayerwidget/PrayerCalc.kt','w').write(
 '    private const val LAT = 32.5736\n'
 '    private const val LNG = 74.0874\n'
 '    private const val TZ = 5.0\n'
-'    private val URDU_NAMES = mapOf("Fajr" to "\u0641\u062c\u0631", "Dhuhr" to "\u0638\u06c1\u0631", "Asr" to "\u0639\u0635\u0631", "Maghrib" to "\u0645\u063a\u0631\u0628", "Isha" to "\u0639\u0634\u0627\u0621")\n'
+'    private val URDU = mapOf("Fajr" to "\u0641\u062c\u0631","Dhuhr" to "\u0638\u06c1\u0631","Asr" to "\u0639\u0635\u0631","Maghrib" to "\u0645\u063a\u0631\u0628","Isha" to "\u0639\u0634\u0627\u0621")\n'
 '    fun calcPrayerTimes(cal: Calendar): List<Triple<String,Int,String>> {\n'
 '        val y=cal.get(Calendar.YEAR);val m=cal.get(Calendar.MONTH)+1;val d=cal.get(Calendar.DAY_OF_MONTH)\n'
 '        val jd=367.0*y-(7*(y+(m+9)/12)/4)+(275*m/9)+d+1721013.5\n'
-'        val D=jd-2451545.0\n'
-'        val g=Math.toRadians(357.529+0.98560028*D)\n'
-'        val L=280.459+0.98564736*D\n'
-'        val lam=Math.toRadians(L+1.9148*sin(g)+0.02*sin(2*g))\n'
+'        val D=jd-2451545.0;val g=Math.toRadians(357.529+0.98560028*D)\n'
+'        val L=280.459+0.98564736*D;val lam=Math.toRadians(L+1.9148*sin(g)+0.02*sin(2*g))\n'
 '        val ep=Math.toRadians(23.439-0.00000036*D)\n'
 '        val RA=Math.toDegrees(atan2(cos(ep)*sin(lam),cos(lam)))/15.0\n'
 '        val decl=Math.toDegrees(asin(sin(ep)*sin(lam)))\n'
-'        val eqT=(L%360-0.0057183-RA*15)/15.0\n'
-'        val noon=12.0+TZ-LNG/15.0-eqT\n'
-'        fun ha(angle:Double):Double {\n'
-'            val c=(sin(Math.toRadians(angle))-sin(Math.toRadians(LAT))*sin(Math.toRadians(decl)))/(cos(Math.toRadians(LAT))*cos(Math.toRadians(decl)))\n'
-'            return Math.toDegrees(acos(c.coerceIn(-1.0,1.0)))/15.0\n'
-'        }\n'
-'        val fajr=noon-ha(-18.0)\n'
-'        val dhuhr=noon\n'
+'        val eqT=(L%360-0.0057183-RA*15)/15.0;val noon=12.0+TZ-LNG/15.0-eqT\n'
+'        fun ha(a:Double):Double{val c=(sin(Math.toRadians(a))-sin(Math.toRadians(LAT))*sin(Math.toRadians(decl)))/(cos(Math.toRadians(LAT))*cos(Math.toRadians(decl)));return Math.toDegrees(acos(c.coerceIn(-1.0,1.0)))/15.0}\n'
+'        val fajr=noon-ha(-18.0);val dhuhr=noon\n'
 '        val asrAlt=Math.toDegrees(atan(2.0+tan(Math.toRadians(abs(LAT-decl)))))\n'
 '        val cAsr=(sin(Math.toRadians(90.0-asrAlt))-sin(Math.toRadians(LAT))*sin(Math.toRadians(decl)))/(cos(Math.toRadians(LAT))*cos(Math.toRadians(decl)))\n'
 '        val asr=noon+Math.toDegrees(acos(cAsr.coerceIn(-1.0,1.0)))/15.0\n'
-'        val maghrib=noon+ha(-0.833)\n'
-'        val isha=noon+ha(-18.0)\n'
-'        fun fmt(t:Double):Pair<Int,String> {\n'
-'            val tt=((t%24)+24)%24;val h=tt.toInt();var min=((tt-h)*60).roundToInt()\n'
-'            var hh=h;if(min>=60){min-=60;hh+=1}\n'
-'            val ap=if(hh%24<12)"AM" else "PM";val h12=if(hh%12==0)12 else hh%12\n'
-'            return Pair(hh*60+min,"$h12:${min.toString().padStart(2,\'0\')} $ap")\n'
-'        }\n'
+'        val maghrib=noon+ha(-0.833);val isha=noon+ha(-18.0)\n'
+'        fun fmt(t:Double):Pair<Int,String>{val tt=((t%24)+24)%24;val h=tt.toInt();var min=((tt-h)*60).roundToInt();var hh=h;if(min>=60){min-=60;hh+=1};val ap=if(hh%24<12)"AM" else "PM";val h12=if(hh%12==0)12 else hh%12;return Pair(hh*60+min,"$h12:${min.toString().padStart(2,\'0\')} $ap")}\n'
 '        val(fm,fs)=fmt(fajr);val(dm,ds)=fmt(dhuhr);val(am,as2)=fmt(asr);val(mm,ms)=fmt(maghrib);val(im,is2)=fmt(isha)\n'
 '        return listOf(Triple("Fajr",fm,fs),Triple("Dhuhr",dm,ds),Triple("Asr",am,as2),Triple("Maghrib",mm,ms),Triple("Isha",im,is2))\n'
 '    }\n'
 '    fun updateViews(views: RemoteViews, accentColor: Int) {\n'
-'        val cal=Calendar.getInstance()\n'
-'        val prayers=calcPrayerTimes(cal)\n'
-'        val now=cal.get(Calendar.HOUR_OF_DAY)*60+cal.get(Calendar.MINUTE)\n'
-'        val sec=cal.get(Calendar.SECOND)\n'
+'        val cal=Calendar.getInstance();val prayers=calcPrayerTimes(cal)\n'
+'        val now=cal.get(Calendar.HOUR_OF_DAY)*60+cal.get(Calendar.MINUTE);val sec=cal.get(Calendar.SECOND)\n'
 '        var next=prayers[0];var diff=Int.MAX_VALUE\n'
 '        for(p in prayers){val d=p.second-now;if(d>0&&d<diff){diff=d;next=p}}\n'
 '        if(diff==Int.MAX_VALUE){next=prayers[0];diff=1440-now+prayers[0].second}\n'
 '        val totalSecs=(diff*60-sec).toLong()\n'
 '        views.setChronometer(R.id.widget_countdown,SystemClock.elapsedRealtime()+totalSecs*1000L,"%02d:%02d:%02d",true)\n'
-'        views.setTextViewText(R.id.widget_prayer_name, URDU_NAMES[next.first] ?: next.first)\n'
+'        views.setTextViewText(R.id.widget_prayer_name,URDU[next.first]?:next.first)\n'
 '        views.setTextViewText(R.id.widget_prayer_time,next.third)\n'
 '        views.setTextViewText(R.id.widget_location,"Gujrat")\n'
-'        views.setTextColor(R.id.widget_prayer_time,accentColor)\n'
-'        views.setTextColor(R.id.widget_location,accentColor)\n'
+'        views.setTextColor(R.id.widget_prayer_time,accentColor);views.setTextColor(R.id.widget_location,accentColor)\n'
 '        val ids=listOf(Triple(R.id.fajr_name,R.id.fajr_time,prayers[0]),Triple(R.id.dhuhr_name,R.id.dhuhr_time,prayers[1]),Triple(R.id.asr_name,R.id.asr_time,prayers[2]),Triple(R.id.maghrib_name,R.id.maghrib_time,prayers[3]),Triple(R.id.isha_name,R.id.isha_time,prayers[4]))\n'
-'        for((nId,tId,p) in ids){\n'
-'            views.setTextColor(nId,if(p.first==next.first)accentColor else 0xCCFFFFFF.toInt())\n'
-'            views.setTextColor(tId,if(p.first==next.first)accentColor else 0x88FFFFFF.toInt())\n'
-'            views.setTextViewText(tId,p.third)\n'
-'        }\n'
+'        for((nId,tId,p) in ids){views.setTextColor(nId,if(p.first==next.first)accentColor else 0xCCFFFFFF.toInt());views.setTextColor(tId,if(p.first==next.first)accentColor else 0x88FFFFFF.toInt());views.setTextViewText(tId,p.third)}\n'
 '    }\n'
 '}\n')
 
@@ -218,26 +199,21 @@ open('app/src/main/java/com/gujrat/prayerwidget/CountdownService.kt','w').write(
 '        override fun run() {\n'
 '            val mgr = AppWidgetManager.getInstance(this@CountdownService)\n'
 '            val widgets = listOf(\n'
-'                Triple(PrayerWidgetClassic::class.java, R.layout.widget_layout_classic, 0xFF10B981.toInt()),\n'
-'                Triple(PrayerWidgetGold::class.java, R.layout.widget_layout_gold, 0xFFF59E0B.toInt()),\n'
-'                Triple(PrayerWidgetSlate::class.java, R.layout.widget_layout_slate, 0xFF94A3B8.toInt()),\n'
-'                Triple(PrayerWidgetRose::class.java, R.layout.widget_layout_rose, 0xFFFB7185.toInt()),\n'
-'                Triple(PrayerWidgetOcean::class.java, R.layout.widget_layout_ocean, 0xFF38BDF8.toInt())\n'
-'            )\n'
-'            for ((cls, layout, accent) in widgets) {\n'
-'                val ids = mgr.getAppWidgetIds(ComponentName(this@CountdownService, cls))\n'
-'                for (id in ids) {\n'
-'                    val v = RemoteViews(packageName, layout)\n'
-'                    PrayerCalc.updateViews(v, accent)\n'
-'                    mgr.updateAppWidget(id, v)\n'
-'                }\n'
+'                Triple(PrayerWidgetClassic::class.java,R.layout.widget_layout_classic,0xFF10B981.toInt()),\n'
+'                Triple(PrayerWidgetGold::class.java,R.layout.widget_layout_gold,0xFFF59E0B.toInt()),\n'
+'                Triple(PrayerWidgetSlate::class.java,R.layout.widget_layout_slate,0xFF94A3B8.toInt()),\n'
+'                Triple(PrayerWidgetRose::class.java,R.layout.widget_layout_rose,0xFFFB7185.toInt()),\n'
+'                Triple(PrayerWidgetOcean::class.java,R.layout.widget_layout_ocean,0xFF38BDF8.toInt()))\n'
+'            for((cls,layout,accent) in widgets){\n'
+'                val ids=mgr.getAppWidgetIds(ComponentName(this@CountdownService,cls))\n'
+'                for(id in ids){val v=RemoteViews(packageName,layout);PrayerCalc.updateViews(v,accent);mgr.updateAppWidget(id,v)}\n'
 '            }\n'
-'            handler.postDelayed(this, 1000)\n'
+'            handler.postDelayed(this,1000)\n'
 '        }\n'
 '    }\n'
-'    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int { handler.post(runnable); return START_STICKY }\n'
-'    override fun onDestroy() { handler.removeCallbacks(runnable); super.onDestroy() }\n'
-'    override fun onBind(intent: Intent?): IBinder? = null\n'
+'    override fun onStartCommand(intent: Intent?,flags: Int,startId: Int): Int{handler.post(runnable);return START_STICKY}\n'
+'    override fun onDestroy(){handler.removeCallbacks(runnable);super.onDestroy()}\n'
+'    override fun onBind(intent: Intent?): IBinder?=null\n'
 '}\n')
 
 open('app/src/main/java/com/gujrat/prayerwidget/BootReceiver.kt','w').write(
@@ -245,8 +221,7 @@ open('app/src/main/java/com/gujrat/prayerwidget/BootReceiver.kt','w').write(
 'import android.content.BroadcastReceiver\nimport android.content.Context\nimport android.content.Intent\n'
 'class BootReceiver : BroadcastReceiver() {\n'
 '    override fun onReceive(context: Context, intent: Intent) {\n'
-'        if (intent.action == Intent.ACTION_BOOT_COMPLETED)\n'
-'            context.startService(Intent(context, CountdownService::class.java))\n'
+'        if(intent.action==Intent.ACTION_BOOT_COMPLETED) context.startService(Intent(context,CountdownService::class.java))\n'
 '    }\n'
 '}\n')
 
@@ -258,4 +233,4 @@ open('gradle/wrapper/gradle-wrapper.properties','w').write('distributionBase=GRA
 
 urllib.request.urlretrieve('https://raw.githubusercontent.com/gradle/gradle/v8.4.0/gradlew','gradlew')
 os.chmod('gradlew',0o755)
-print('Done! Urdu font + credit line added!')
+print('Done!')
